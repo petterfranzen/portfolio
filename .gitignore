@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local Lab testing (see README's "Running the Lab locally")
+projects.json
+stacks/
