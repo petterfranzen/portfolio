@@ -1,4 +1,5 @@
 import "./style.css";
+import { setupLab } from "./lab.js";
 
 type Theme = "light" | "dark";
 
@@ -66,3 +67,4 @@ initTheme();
 setupThemeToggle();
 setupNavToggle();
 setupFooterYear();
+setupLab();
