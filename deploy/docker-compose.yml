@@ -1,0 +1,42 @@
+# NAS-facing compose file for the portfolio site.
+#
+# Self-contained the same way flight-tracker's and docker-monitor's are:
+# every setting is inlined as ${VAR:-default}, so pasting this one file
+# into a GUI Docker app is enough.
+#
+# This stack is one container, but it is NOT independent: the Lab section
+# proxies /lab-api/ to docker-monitor (see ../nginx.conf). Both must be on
+# the same Docker network for that hostname to resolve — hence the
+# external network below. Bring docker-monitor up first.
+#
+# Without docker-monitor running, everything except the Lab still works;
+# the Lab shows "the NAS isn't reachable right now", which is true and is
+# the honest thing for it to say.
+
+name: portfolio
+
+services:
+  portfolio:
+    image: ghcr.io/petterfranzen/portfolio:${IMAGE_TAG:-latest}
+    container_name: portfolio
+    restart: unless-stopped
+    ports:
+      - "${PORTFOLIO_PORT:-8081}:80"
+    networks:
+      - default
+      - docker-monitor
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  # docker-monitor's compose project creates this. `external: true` means
+  # this file joins it rather than trying to own it — so `docker compose
+  # down` here never takes the monitor's network out from under it.
+  #
+  # If docker-monitor runs under a different project name, change the
+  # network name to match (`docker network ls` will show it).
+  docker-monitor:
+    external: true
+    name: docker-monitor_default
