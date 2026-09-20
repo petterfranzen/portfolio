@@ -27,6 +27,17 @@ services:
       - docker-monitor
     cap_drop:
       - ALL
+    cap_add:
+      # nginx's entrypoint chowns its cache directories and its workers
+      # drop from root to the nginx user, so these three are genuinely
+      # required. With a bare `cap_drop: ALL` the container restart-loops
+      # on `chown("/var/cache/nginx/client_temp") failed: Operation not
+      # permitted` and never serves a request — found deploying this for
+      # real, because a plain `docker run` (no cap_drop) is what local
+      # testing had used.
+      - CHOWN
+      - SETGID
+      - SETUID
     security_opt:
       - no-new-privileges:true
 
