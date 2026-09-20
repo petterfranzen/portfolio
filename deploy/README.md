@@ -17,6 +17,18 @@ NAS with a PAT carrying `read:packages`. Same choice as
 [flight-tracker's deploy README](../../flight-tracker/deploy/README.md)
 describes in more detail.
 
+## Simpler alternative: one combined stack
+
+If you're deploying the whole Lab at once — and especially if you're
+pasting YAML into UGOS's Docker app rather than using a terminal — use
+[`docker-monitor/deploy/lab-stack.yml`](../../docker-monitor/deploy/lab-stack.yml)
+instead of this file. It runs the socket proxy, ntfy, docker-monitor and
+this site as a single Compose project, so there's no external network to
+line up and no separate `projects.json` to place on disk.
+
+The rest of this file is the split-project route, where the portfolio is
+its own Compose project joining docker-monitor's network.
+
 ## 3. Bring up docker-monitor first
 
 The Lab section talks to docker-monitor through this container's nginx, at
