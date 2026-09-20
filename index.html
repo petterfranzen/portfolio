@@ -20,6 +20,7 @@
         <nav class="site-nav" id="site-nav" aria-label="Primary">
           <a href="#about">About</a>
           <a href="#projects">Projects</a>
+          <a href="#lab">Lab</a>
           <a href="#contact">Contact</a>
         </nav>
 
@@ -234,38 +235,67 @@
             </p>
             <div class="project-card-foot">
               <span class="project-badge project-badge-done">Home NAS deployment</span>
+              <a class="project-link" href="#lab">Start a demo ↓</a>
             </div>
           </article>
 
           <article class="project-card">
             <div class="project-card-head">
               <h3>Dinner Planner</h3>
-              <span class="project-badge project-badge-progress">In progress</span>
             </div>
             <p>
-              A weekly meal-planning app for two, with recipe import and
-              shopping list export. Currently being actively built —
-              details and a live link will follow once it's further along.
+              A weekly meal-planning app for two people sharing a household:
+              add recipes by hand or import them from a URL, assign them to a
+              Mon–Sun plan together, and get one consolidated, categorised
+              shopping list for the week.
+            </p>
+            <p class="project-stack">
+              <strong>Stack:</strong> Node + TypeScript + Express with SQLite,
+              a React + Vite frontend, and Docker Compose.
             </p>
             <div class="project-card-foot">
-              <span class="project-badge project-badge-progress">Coming soon</span>
+              <span class="project-badge project-badge-done">Home NAS deployment</span>
+              <a class="project-link" href="#lab">Start a demo ↓</a>
             </div>
           </article>
 
           <article class="project-card">
             <div class="project-card-head">
-              <h3>Vim Trainer</h3>
+              <h3>Vim Quest</h3>
               <span class="project-badge project-badge-progress">In progress</span>
             </div>
             <p>
-              A game that teaches Vim motions through an ASCII platformer.
-              Currently being actively built — details and a live link will
-              follow once it's further along.
+              A browser platformer that teaches real Vim motions: you move an
+              ASCII character with actual Vim keybindings, and each of its 17
+              levels unlocks one new command family you then need to solve it.
+            </p>
+            <p class="project-stack">
+              <strong>Stack:</strong> Vite + vanilla TypeScript, no framework
+              and no backend; progress persists to localStorage.
             </p>
             <div class="project-card-foot">
-              <span class="project-badge project-badge-progress">Coming soon</span>
+              <span class="project-badge project-badge-progress">Not yet deployed</span>
             </div>
           </article>
+        </div>
+      </section>
+
+      <section id="lab" class="section wrap">
+        <h2>The Lab</h2>
+        <p class="lab-intro">
+          These projects run on a home NAS rather than a cloud host, so they
+          aren't left running around the clock. Start one here and it'll come
+          up for you — you can watch it boot, and it shuts itself down again
+          after an hour so it isn't left running by accident.
+        </p>
+
+        <div id="lab-projects" class="lab-projects">
+          <noscript>
+            <p class="lab-status">
+              The live status here needs JavaScript. The source for each
+              project is linked in the Projects section above.
+            </p>
+          </noscript>
         </div>
       </section>
 
