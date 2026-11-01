@@ -2,7 +2,8 @@
 
 Personal portfolio and CV website for Petter Franzén — a single-page static
 site with a hero/intro, an About/CV section (experience, education, skills),
-a projects showcase, and a contact section.
+a projects showcase, an experiments list, the interactive Lab, and a contact
+section.
 
 ## The Lab
 
@@ -32,6 +33,25 @@ exposed to the internet directly.
 With the NAS unreachable — it's a home server, it's sometimes off — the
 Lab says so and the rest of the page is unaffected.
 
+## Experiments
+
+The Experiments section lists the nightly apps from
+[ghost-in-the-machine](https://github.com/petterfranzen/ghost-in-the-machine),
+which are published on GitHub Pages. That list grows by one every night, so it
+is **generated at build time** rather than kept by hand here — and it is never
+fetched by the browser, so the section ships with the bundle and costs no
+requests.
+
+`scripts/build-experiments.mjs` runs as `prebuild`, ahead of `tsc`, and makes
+two public reads of that repo: the `nights/` directory listing (which night
+folders actually exist) and `LOG.md` (the idea and the language for each). It
+writes `src/experiments.generated.ts`, which `src/experiments.ts` renders.
+
+That generated file is committed, so a build with no network still ships a
+list. When the reads fail — offline, or the API refusing — the script keeps the
+committed copy and warns rather than failing the build. Set `GITHUB_TOKEN` in
+the environment to lift the anonymous API rate limit if a build ever hits it.
+
 ## Tech stack
 
 **Vite + vanilla TypeScript**, no UI framework.
@@ -53,6 +73,9 @@ index.html      Page markup and content (all sections live here)
 src/style.css   All styling, incl. light/dark theme tokens and responsive rules
 src/main.ts     Theme toggle, mobile nav toggle, footer year
 src/lab.ts      The Lab: live project status and start/stop, via /lab-api/
+src/experiments.ts             Experiments: renders the generated nightly list
+src/experiments.generated.ts   Generated at build time; do not edit by hand
+scripts/build-experiments.mjs  Builds that list from the ghost-in-the-machine repo
 public/         Static assets served as-is (favicon)
 nginx.conf      Serves the built site; proxies /lab-api/ to docker-monitor
 Dockerfile      Build the bundle, serve it from nginx
@@ -115,8 +138,9 @@ run test:lab` to drive the journey test against it.
   below 640px), a CV layout that stacks from two columns to one, and a
   project grid that reflows via `auto-fit`/`minmax`. Verified at both
   desktop and mobile (390px) viewport widths.
-- **No backend, no build-time data fetching** — content lives directly in
-  `index.html`.
+- **No backend.** Content lives directly in `index.html`, with one exception:
+  the Experiments list is generated at build time from the ghost-in-the-machine
+  repo (see above) and baked into the bundle. The browser never calls GitHub.
 
 ## Content still to fill in
 
