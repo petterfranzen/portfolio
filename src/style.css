@@ -9,7 +9,7 @@
   --color-border: #e2e2e8;
   --color-text: #1b1b1f;
   --color-text-muted: #55555f;
-  --color-accent: #2f6fed;
+  --color-accent: #2d6ae8;
   --color-accent-contrast: #ffffff;
   --color-badge-progress-bg: #fff4d6;
   --color-badge-progress-text: #8a6100;
@@ -88,6 +88,12 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   margin: 0;
   min-width: 0;
@@ -95,6 +101,8 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   line-height: 1.6;
+  /* Inherited by body copy; browsers without it break lines exactly as before. */
+  text-wrap: pretty;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -119,6 +127,7 @@ h3,
 h4 {
   line-height: 1.2;
   margin: 0 0 0.5em;
+  text-wrap: balance;
 }
 
 p {
@@ -292,15 +301,6 @@ ul {
   max-width: 44rem;
 }
 
-.eyebrow {
-  color: var(--color-accent);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-  font-size: 0.85rem;
-  margin-bottom: 0.5rem;
-}
-
 .hero h1 {
   font-size: clamp(2.25rem, 1.7rem + 2.5vw, 3.5rem);
 }
@@ -413,6 +413,8 @@ ul {
 
 .cv-entry ul {
   color: var(--color-text-muted);
+  /* Same measure as .bio: the 2fr column alone runs to ~95 characters a line. */
+  max-width: 38rem;
 }
 
 .skills-list {
@@ -433,6 +435,13 @@ ul {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   gap: 1.5rem;
+}
+
+/* Scoped to Projects: adding Docker Monitor took this to four cards, and
+   four across at desktop left each one a tall, narrow column. Two up suits
+   the longer write-ups; the Lab's grid is left as it was. */
+#projects .project-grid {
+  grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
 }
 
 .project-card {
@@ -491,6 +500,11 @@ ul {
 .project-badge-done {
   background: var(--color-badge-done-bg);
   color: var(--color-badge-done-text);
+}
+
+.project-badge-live {
+  background: var(--color-badge-live-bg);
+  color: var(--color-badge-live-text);
 }
 
 /* ---------- Contact ---------- */
@@ -553,6 +567,94 @@ ul {
 
   .hero {
     padding-block: 2.5rem;
+  }
+}
+
+/* ---------- Experiments ---------- */
+
+.section-intro {
+  max-width: 52ch;
+  color: var(--color-text-muted);
+}
+
+.experiments-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.experiment {
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* The whole row is the link: a night is one object, not a title plus a
+   separate "open" affordance. */
+.experiment-link {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 0.15rem 1.5rem;
+  align-items: baseline;
+  padding: 0.85rem 0;
+  color: inherit;
+}
+
+.experiment-link:hover,
+.experiment-link:focus-visible {
+  text-decoration: none;
+}
+
+.experiment-link:hover .experiment-title,
+.experiment-link:focus-visible .experiment-title {
+  color: var(--color-accent);
+}
+
+.experiment-date {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.experiment-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.experiment-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.experiment-title {
+  font-weight: 600;
+}
+
+.experiment-language {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.experiment-idea {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  max-width: 60ch;
+}
+
+.experiments-more,
+.experiments-fallback {
+  margin-top: 1.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  max-width: 62ch;
+}
+
+@media (max-width: 640px) {
+  .experiment-link {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
   }
 }
 
