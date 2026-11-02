@@ -44,16 +44,27 @@ function setupNavToggle() {
   const nav = document.getElementById("site-nav");
   if (!navToggle || !nav) return;
 
+  const close = () => {
+    nav.classList.remove("is-open");
+    navToggle.setAttribute("aria-expanded", "false");
+  };
+
   navToggle.addEventListener("click", () => {
     const isOpen = nav.classList.toggle("is-open");
     navToggle.setAttribute("aria-expanded", String(isOpen));
   });
 
   nav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      nav.classList.remove("is-open");
-      navToggle.setAttribute("aria-expanded", "false");
-    });
+    link.addEventListener("click", close);
+  });
+
+  // Escape closes the disclosure and returns focus to its trigger, which is
+  // what a keyboard user expects from a menu button.
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && nav.classList.contains("is-open")) {
+      close();
+      navToggle.focus();
+    }
   });
 }
 
