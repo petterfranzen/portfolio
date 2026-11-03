@@ -1,83 +1,38 @@
 import "./style.css";
-import { setupExperiments } from "./experiments.js";
-import { setupLab } from "./lab.js";
+import { EXPERIMENTS } from "./experiments.generated.js";
 
-type Theme = "light" | "dark";
+const list = document.getElementById("experiments");
+if (list) {
+  list.innerHTML = EXPERIMENTS.slice(0, 6)
+    .map((night) => {
+      const a = document.createElement("a");
+      a.href = night.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = night.title;
+      a.title = `${night.language}: ${night.idea}`;
+      const li = document.createElement("li");
+      li.appendChild(a);
+      return li.outerHTML;
+    })
+    .join("");
+}
 
-const THEME_STORAGE_KEY = "portfolio-theme";
+// Gentle pointer parallax on the background, off for reduced motion.
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
 const root = document.documentElement;
-
-function getStoredTheme(): Theme | null {
-  const stored = localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === "light" || stored === "dark" ? stored : null;
+if (!reduce.matches) {
+  let frame = 0;
+  window.addEventListener(
+    "pointermove",
+    (event) => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        root.style.setProperty("--px", String(event.clientX / window.innerWidth - 0.5));
+        root.style.setProperty("--py", String(event.clientY / window.innerHeight - 0.5));
+      });
+    },
+    { passive: true },
+  );
 }
-
-function getSystemTheme(): Theme {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
-function applyTheme(theme: Theme) {
-  root.setAttribute("data-theme", theme);
-}
-
-function initTheme() {
-  const stored = getStoredTheme();
-  applyTheme(stored ?? getSystemTheme());
-}
-
-function setupThemeToggle() {
-  const toggle = document.getElementById("theme-toggle");
-  if (!toggle) return;
-
-  toggle.addEventListener("click", () => {
-    const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
-    const next: Theme = current === "dark" ? "light" : "dark";
-    applyTheme(next);
-    localStorage.setItem(THEME_STORAGE_KEY, next);
-  });
-}
-
-function setupNavToggle() {
-  const navToggle = document.getElementById("nav-toggle");
-  const nav = document.getElementById("site-nav");
-  if (!navToggle || !nav) return;
-
-  const close = () => {
-    nav.classList.remove("is-open");
-    navToggle.setAttribute("aria-expanded", "false");
-  };
-
-  navToggle.addEventListener("click", () => {
-    const isOpen = nav.classList.toggle("is-open");
-    navToggle.setAttribute("aria-expanded", String(isOpen));
-  });
-
-  nav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", close);
-  });
-
-  // Escape closes the disclosure and returns focus to its trigger, which is
-  // what a keyboard user expects from a menu button.
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && nav.classList.contains("is-open")) {
-      close();
-      navToggle.focus();
-    }
-  });
-}
-
-function setupFooterYear() {
-  const yearEl = document.getElementById("year");
-  if (yearEl) {
-    yearEl.textContent = String(new Date().getFullYear());
-  }
-}
-
-initTheme();
-setupThemeToggle();
-setupNavToggle();
-setupFooterYear();
-setupExperiments();
-setupLab();
