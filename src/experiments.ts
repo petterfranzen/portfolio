@@ -1,10 +1,10 @@
 /**
- * The Experiments section: the nightly apps from ghost-in-the-machine.
+ * The nightly experiments: apps from ghost-in-the-machine, one per night.
  *
  * The list is generated at build time (scripts/build-experiments.mjs) and
- * imported as data, so nothing is fetched from GitHub at runtime — the section
- * ships with the bundle and costs no requests. Same reasoning as the Lab:
- * vanilla TypeScript, a short render, no framework.
+ * imported as data, so nothing is fetched from GitHub at runtime — the tiles
+ * ship with the bundle and cost no requests. Each tile then loads a live
+ * preview from GitHub Pages, lazily, and only once it's near the viewport.
  */
 
 import {
@@ -13,6 +13,9 @@ import {
   EXPERIMENTS_INDEX,
   type Experiment,
 } from "./experiments.generated.js";
+
+/** Enough to show the idea without turning the section into an archive. */
+const MAX_TILES = 6;
 
 /** Night titles and ideas come from the repo as text, so they're escaped. */
 function escapeHtml(value: string): string {
@@ -24,19 +27,68 @@ function escapeHtml(value: string): string {
 }
 
 function item(night: Experiment): string {
+  const url = escapeHtml(night.url);
   return `
     <li class="experiment">
-      <a class="experiment-link" href="${escapeHtml(night.url)}" target="_blank" rel="noopener noreferrer">
-        <time class="experiment-date" datetime="${escapeHtml(night.date)}">${escapeHtml(night.date)}</time>
-        <span class="experiment-body">
-          <span class="experiment-head">
-            <span class="experiment-title">${escapeHtml(night.title)}</span>
-            <span class="experiment-language">${escapeHtml(night.language)}</span>
-          </span>
-          <span class="experiment-idea">${escapeHtml(night.idea)}</span>
+      <a class="tile" href="${url}" target="_blank" rel="noopener noreferrer">
+        <span class="tile-preview" data-preview="${url}"></span>
+        <span class="tile-meta">
+          <span class="tile-title">${escapeHtml(night.title)}</span>
+          <span class="tile-idea">${escapeHtml(night.idea)}</span>
+          <span class="tile-meta-foot">${escapeHtml(night.language)} · <time datetime="${escapeHtml(night.date)}">${escapeHtml(night.date)}</time></span>
         </span>
       </a>
     </li>`;
+}
+
+/**
+ * Swaps each placeholder for an iframe of the published page, a little before
+ * it scrolls into view. The iframe is inert (pointer-events: none) so it can't
+ * swallow a phone scroll — the tile itself is the link.
+ */
+function setupPreviews(root: HTMLElement): void {
+  const previews = Array.from(
+    root.querySelectorAll<HTMLElement>("[data-preview]"),
+  );
+  if (previews.length === 0) return;
+
+  const load = (preview: HTMLElement) => {
+    const src = preview.dataset.preview;
+    if (!src || preview.querySelector("iframe")) return;
+
+    const frame = document.createElement("iframe");
+    frame.src = src;
+    frame.loading = "lazy";
+    frame.tabIndex = -1;
+    frame.setAttribute("aria-hidden", "true");
+    frame.setAttribute("scrolling", "no");
+    frame.title = "";
+    preview.append(frame);
+  };
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // Nothing to animate, but the previews still have to load.
+    previews.forEach(load);
+    return;
+  }
+
+  if (!("IntersectionObserver" in window)) {
+    previews.forEach(load);
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        load(entry.target as HTMLElement);
+        observer.unobserve(entry.target);
+      });
+    },
+    { rootMargin: "600px 0px" },
+  );
+
+  previews.forEach((preview) => observer.observe(preview));
 }
 
 export function setupExperiments(): void {
@@ -48,14 +100,16 @@ export function setupExperiments(): void {
     return;
   }
 
+  const shown = EXPERIMENTS.slice(0, MAX_TILES);
+
   container.innerHTML = `
-    <ul class="experiments-list">
-      ${EXPERIMENTS.map(item).join("")}
+    <ul class="experiments-grid">
+      ${shown.map(item).join("")}
     </ul>
     <p class="experiments-more">
-      Everything is public:
-      <a href="${EXPERIMENTS_INDEX}" target="_blank" rel="noopener noreferrer">the whole run so far</a>
-      and <a href="${CREW_URL}" target="_blank" rel="noopener noreferrer">the crew behind it</a>:
-      five agents on Section 9 callsigns and all.
+      <a href="${EXPERIMENTS_INDEX}" target="_blank" rel="noopener noreferrer">Every night so far</a>
+      · <a href="${CREW_URL}" target="_blank" rel="noopener noreferrer">the crew behind them</a>
     </p>`;
+
+  setupPreviews(container);
 }

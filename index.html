@@ -4,24 +4,31 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
     <meta
       name="description"
-      content="Personal portfolio and CV of Petter Franzén — Engineering Manager, Principal Engineer and Solutions Architect."
+      content="Petter Franzén — Engineering Manager, Principal Engineer and Solutions Architect in Stockholm. Live apps and nightly experiments."
     />
     <title>Petter Franzén — Engineering Manager</title>
+    <script>
+      // Set before first paint so the reveal styles never flash content in and
+      // out. Without JS the class is absent and everything is simply visible.
+      document.documentElement.classList.add("js");
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header">
       <div class="wrap header-inner">
-        <a class="brand" href="#hero">Petter Franzén</a>
+        <a class="brand" href="#top">
+          <span class="brand-mark" aria-hidden="true">PF</span>
+          <span class="brand-name">Petter Franzén</span>
+        </a>
 
         <nav class="site-nav" id="site-nav" aria-label="Primary">
-          <a href="#about">About</a>
-          <a href="#projects">Projects</a>
-          <a href="#experiments">Experiments</a>
-          <a href="#lab">Lab</a>
+          <a href="#work">Work</a>
+          <a href="#apps">Apps</a>
           <a href="#contact">Contact</a>
         </nav>
 
@@ -30,10 +37,16 @@
             id="theme-toggle"
             class="icon-button"
             type="button"
-            aria-label="Toggle dark and light theme"
+            aria-label="Switch to light theme"
+            aria-pressed="false"
           >
-            <span class="theme-icon theme-icon-sun" aria-hidden="true">☀️</span>
-            <span class="theme-icon theme-icon-moon" aria-hidden="true">🌙</span>
+            <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="4.2" />
+              <path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M18.6 5.4l-1.8 1.8M7.2 16.8l-1.8 1.8" />
+            </svg>
+            <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M20 14.4A8.4 8.4 0 0 1 9.6 4a8.4 8.4 0 1 0 10.4 10.4Z" />
+            </svg>
           </button>
           <button
             id="nav-toggle"
@@ -50,311 +63,176 @@
     </header>
 
     <main id="main">
-      <section id="hero" class="hero wrap">
-        <h1>Petter Franzén</h1>
-        <p class="tagline">Engineering Manager · Principal Engineer · Solutions Architect</p>
-        <p class="bio">
-          Engineering leader with more than fifteen years across hands-on
-          development, architecture and people management. Founding member
-          of British Airways' Software Engineering Centre of Excellence,
-          setting engineering standards for a delivery organisation of
-          roughly 4,000 people. Seeking a senior engineering leadership role
-          in Stockholm.
-        </p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#projects">See my projects</a>
-          <a class="button button-ghost" href="#contact">Get in touch</a>
+      <section id="top" class="hero">
+        <div class="hero-bg" aria-hidden="true">
+          <div class="hero-layer hero-glow" style="--depth: 0.5"></div>
+          <div class="hero-layer hero-grid" style="--depth: 0.22"></div>
+          <div class="hero-layer hero-word" style="--depth: 0.75">FRANZÉN</div>
         </div>
+
+        <div class="wrap hero-inner">
+          <p class="eyebrow">Stockholm, Sweden</p>
+          <h1 class="hero-title">Petter<br />Franzén</h1>
+          <p class="hero-titles">
+            Engineering Manager <span aria-hidden="true">·</span> Principal Engineer
+            <span aria-hidden="true">·</span> Solutions Architect
+          </p>
+          <p class="hero-lead">
+            I lead engineering teams and the platforms they ship on — most
+            recently at British Airways and notonthehighstreet. Below are the
+            things I've built that you can actually open.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#apps">See the apps</a>
+            <a
+              class="button button-ghost"
+              href="https://www.linkedin.com/in/petterf/"
+              target="_blank"
+              rel="noopener noreferrer"
+              >LinkedIn <span aria-hidden="true">↗</span></a
+            >
+          </div>
+        </div>
+
+        <div class="hero-fade" aria-hidden="true"></div>
       </section>
 
-      <section id="about" class="section wrap">
-        <h2>About &amp; CV</h2>
-
-        <div class="cv-grid">
-          <div class="cv-column cv-main">
-            <div class="cv-block">
-              <h3>Experience</h3>
-
-              <article class="cv-entry">
-                <div class="cv-entry-head">
-                  <h4>Senior Engineering Manager — IAG / British Airways</h4>
-                  <span class="cv-dates">Jul 2023 – Mar 2026</span>
-                </div>
-                <p class="cv-location">BA Digital, London, UK</p>
-                <ul>
-                  <li>One of the founding members of British Airways' Software Engineering Centre of Excellence within BA Digital, recruited to build the function from scratch.</li>
-                  <li>Established a technical maturity assessment framework, initially across 25 teams (~200 engineers), later scaled across the full ~4,000-person engineering organisation.</li>
-                  <li>Team created the code-quality dashboards used by leadership and initiated a partnership with CodeScene to connect code health directly to business value.</li>
-                  <li>Grew the GitHub estate from 2,000 to 7,000 repositories, migrating source from legacy tools such as SVN and CVS.</li>
-                  <li>Scaled GitHub Copilot adoption from a pilot group to 600+ active engineers.</li>
-                  <li>Grew the team through hiring of DevOps engineers.</li>
-                </ul>
-              </article>
-
-              <article class="cv-entry">
-                <div class="cv-entry-head">
-                  <h4>Senior Developer → Solutions Architect — notonthehighstreet</h4>
-                  <span class="cv-dates">Jul 2017 – Mar 2023</span>
-                </div>
-                <p class="cv-location">London, UK</p>
-                <ul>
-                  <li>Six years of progression through Tech Lead and Principal Engineer on an initially Rails-based marketplace serving 5,000+ partners and three million customers.</li>
-                  <li>Joined as one of few engineers with deep JavaScript and React experience.</li>
-                  <li>As Tech Lead, led the rebuild of all product listing pages to server-side rendered React with clear SEO gains, then rebuilt the basket and checkout on Apollo GraphQL.</li>
-                  <li>As Principal Engineer, designed the frontend monorepo enabling end-to-end testing, delivered a new product page and a headless-CMS-powered homepage and new global header/footer; owned frontend strategy from tooling to performance.</li>
-                  <li>As Solutions Architect, led the experimentation (A/B testing) platform selection — the resulting solution was deployed on edge workers, delivering personalised content in under 50ms.</li>
-                </ul>
-              </article>
-
-              <article class="cv-entry">
-                <div class="cv-entry-head">
-                  <h4>Software Developer — Tesco</h4>
-                  <span class="cv-dates">Nov 2016 – Jul 2017</span>
-                </div>
-                <p class="cv-location">UK</p>
-                <ul>
-                  <li>Worked as a JavaScript engineer rebuilding the online grocery service of Tesco, the UK's largest food retailer, from the ground up using progressive enhancement — fully functional in plain HTML with a richer React/Redux experience layered on top.</li>
-                  <li>Extended the GraphQL API with voucher payment support.</li>
-                </ul>
-              </article>
-
-              <article class="cv-entry">
-                <div class="cv-entry-head">
-                  <h4>Senior Developer — YouView TV</h4>
-                  <span class="cv-dates">Apr 2016 – Oct 2016</span>
-                </div>
-                <p class="cv-location">UK</p>
-                <ul>
-                  <li>Developed the user experience for the next-generation set-top box at YouView — the hybrid-TV joint venture of the BBC, ITV, Channel 4 and BT — in RxJS, among other things.</li>
-                  <li>Delivered the PIN-controlled lock for age-restricted content.</li>
-                </ul>
-              </article>
-
-              <article class="cv-entry">
-                <div class="cv-entry-head">
-                  <h4>Senior Developer — Sky</h4>
-                  <span class="cv-dates">Mar 2013 – Apr 2016</span>
-                </div>
-                <p class="cv-location">UK</p>
-                <ul>
-                  <li>At Europe's largest pay-TV broadcaster, delivered the NowTV streaming app for LG Smart TV in close collaboration with LG on DRM and Microsoft Smooth Streaming.</li>
-                  <li>Delivered the NowTV Chromecast app alongside engineers from Google.</li>
-                  <li>Delivered Sky Sports News for Sky Q.</li>
-                </ul>
-              </article>
-
-              <article class="cv-entry">
-                <div class="cv-entry-head">
-                  <h4>Software Developer — Accedo.tv</h4>
-                  <span class="cv-dates">Mar 2011 – Oct 2013</span>
-                </div>
-                <p class="cv-location">Stockholm, Sweden</p>
-                <ul>
-                  <li>Shipped games and streaming apps to Smart TV platforms.</li>
-                  <li>Developed a complete VOD service for Germany's Maxdome on Panasonic Smart TV almost single-handedly.</li>
-                  <li>Worked on the Boxer set-top-box platform with SagemCom.</li>
-                </ul>
-              </article>
-
-              <article class="cv-entry">
-                <div class="cv-entry-head">
-                  <h4>Earlier</h4>
-                  <span class="cv-dates">2003 – 2011</span>
-                </div>
-                <ul>
-                  <li>Ericsson — fibre-router configuration tooling in C (2010–11)</li>
-                  <li>Linköping University — research software in C# (2007)</li>
-                  <li>Swedish Armed Forces, Lv6 — Kompanibefäl, SUTEK specialisation (2003–04)</li>
-                </ul>
-              </article>
+      <section id="work" class="section wrap">
+        <h2 class="section-title reveal">Work</h2>
+        <ol class="work-list">
+          <li class="work-item reveal">
+            <div class="work-head">
+              <h3 class="work-org">IAG / British Airways</h3>
+              <p class="work-role">Senior Engineering Manager</p>
+              <p class="work-years">2023–2026</p>
             </div>
+            <p class="work-line">
+              Founding member of BA Digital's Software Engineering Centre of
+              Excellence, setting technical standards across a 4,000-person
+              engineering organisation.
+            </p>
+          </li>
+          <li class="work-item reveal">
+            <div class="work-head">
+              <h3 class="work-org">notonthehighstreet</h3>
+              <p class="work-role">Senior Developer to Solutions Architect</p>
+              <p class="work-years">2017–2023</p>
+            </div>
+            <p class="work-line">
+              Six years from Tech Lead to Solutions Architect on a marketplace
+              serving three million customers.
+            </p>
+          </li>
+        </ol>
+      </section>
 
-            <div class="cv-block">
-              <h3>Education</h3>
+      <section id="apps" class="section apps">
+        <div class="wrap">
+          <h2 class="section-title reveal">Apps</h2>
+          <p class="section-intro reveal">
+            Two things worth your time: one running live, and one new small
+            thing every night.
+          </p>
+        </div>
 
-              <article class="cv-entry">
-                <div class="cv-entry-head">
-                  <h4>Studies in Computer Engineering, KTH</h4>
-                  <span class="cv-dates">2004 – 2005</span>
-                </div>
-              </article>
-
-              <article class="cv-entry">
-                <div class="cv-entry-head">
-                  <h4>Cognitive Science, Linköping University</h4>
-                  <span class="cv-dates">2005 – 2007</span>
-                </div>
-              </article>
+        <article class="showcase wrap reveal" aria-labelledby="flight-title">
+          <div class="showcase-frame">
+            <div class="showcase-bar" aria-hidden="true">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="showcase-url">flight.pastabake.cloud</span>
+            </div>
+            <div class="showcase-screen">
+              <img
+                class="showcase-shot shot-a"
+                src="/apps/flight-1.webp"
+                width="1440"
+                height="900"
+                alt="Flight Tracker: a dark map of northern Europe with hundreds of aircraft plotted as small cyan triangles."
+                loading="lazy"
+                decoding="async"
+              />
+              <img
+                class="showcase-shot shot-b"
+                src="/apps/flight-2.webp"
+                width="1440"
+                height="900"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="live-badge"><span class="live-dot" aria-hidden="true"></span>Live</span>
             </div>
           </div>
 
-          <div class="cv-column cv-side">
-            <div class="cv-block">
-              <h3>Skills</h3>
-              <ul class="skills-list">
-                <li><strong>AI-Assisted Engineering:</strong> AI-SDLC adoption at enterprise scale — GitHub Copilot from pilot to 600+ engineers, agentic workflow evaluation (Cursor, AWS Kiro &amp; Bedrock)</li>
-                <li><strong>Leadership:</strong> Engineering management, organisational design, stakeholder management, hiring, DORA metrics, Agile, Scrum, Kanban</li>
-                <li><strong>Architecture:</strong> Distributed systems, microservices, event-driven architecture, API design, edge workers, monorepos</li>
-                <li><strong>Development tooling:</strong> React, Next.js, TypeScript, Node.js, GraphQL, RxJS, Redux, Python</li>
-                <li><strong>Platforms &amp; Quality:</strong> AWS, GCP, Docker, GitHub Actions, Jenkins, Specmatic, SonarQube, CodeScene</li>
-              </ul>
-            </div>
+          <div class="showcase-copy">
+            <p class="eyebrow">Flight Tracker</p>
+            <h3 id="flight-title" class="showcase-title">Every aircraft, right now</h3>
+            <p class="showcase-text">
+              Live global flight tracking. An always-on sweep keeps a position
+              history for every aircraft in the world, so distance flown and
+              airborne hours come straight out of that history — no separate
+              bookkeeping to drift out of sync.
+            </p>
+            <ul class="tag-list" aria-label="Built with">
+              <li>Java 21</li>
+              <li>Spring Boot</li>
+              <li>SQLite</li>
+              <li>MapLibre</li>
+            </ul>
+            <a
+              class="button button-primary"
+              href="https://flight.pastabake.cloud"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Open the live app <span aria-hidden="true">↗</span></a
+            >
+          </div>
+        </article>
 
-            <div class="cv-block">
-              <h3>Languages</h3>
-              <ul class="skills-list">
-                <li>Swedish — native</li>
-                <li>English — fluent</li>
-              </ul>
-            </div>
+        <div class="wrap">
+          <div class="experiments-head reveal">
+            <h3 class="experiments-title">Nightly experiments</h3>
+            <p class="experiments-intro">
+              One small app a night, built by an AI agent while I sleep — a new
+              language and a new idea each time. All of them are playable.
+            </p>
+          </div>
+
+          <div id="experiments-list">
+            <noscript>
+              <p class="experiments-fallback">
+                The previews need JavaScript. Every night is published under
+                <a href="https://petterfranzen.github.io/ghost-in-the-machine/" target="_blank" rel="noopener noreferrer">ghost-in-the-machine</a>.
+              </p>
+            </noscript>
           </div>
         </div>
       </section>
 
-      <section id="projects" class="section wrap">
-        <h2>Projects</h2>
-
-        <div class="project-grid">
-          <article class="project-card">
-            <div class="project-card-head">
-              <h3>Flight Tracker</h3>
-            </div>
-            <p>
-              Live global flight tracking. An always-on sweep keeps a
-              position history current for every aircraft worldwide while a
-              faster poll follows whatever's actually on screen, so the map
-              stays live without pulling the whole world at once. Every
-              position is kept for 72 hours, which is what lets it derive
-              distance flown and airborne hours for any window straight from
-              that history, with no separate usage table to keep in sync.
-            </p>
-            <p class="project-stack">
-              <strong>Stack:</strong> Java 21 / Spring Boot in a single
-              process: REST, WebSocket and the pollers in one JVM, with
-              SQLite in WAL mode and a Vanilla TypeScript + MapLibre GL
-              frontend.
-            </p>
-            <div class="project-card-foot">
-              <span class="project-badge project-badge-live">Live</span>
-              <a class="project-link" href="https://flight.pastabake.cloud" target="_blank" rel="noopener noreferrer">flight.pastabake.cloud ↗</a>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-card-head">
-              <h3>Docker Monitor</h3>
-            </div>
-            <p>
-              A small service that watches every container on my home NAS
-              and pushes an alert when one breaks: stopped unexpectedly,
-              restart-looping, failing its healthcheck, gone quiet, or
-              suddenly spiking. The same service exposes a small API that
-              starts, stops and updates the Compose projects it has been told
-              it may control, which is what the demo buttons in The Lab below
-              talk to.
-            </p>
-            <p class="project-stack">
-              <strong>Stack:</strong> Python 3 with the Docker SDK, FastAPI +
-              uvicorn for the control API, and ntfy for the notifications. No
-              build step.
-            </p>
-            <div class="project-card-foot">
-              <span class="project-badge project-badge-done">Home NAS service</span>
-              <a class="project-link" href="https://github.com/petterfranzen/docker-monitor" target="_blank" rel="noopener noreferrer">Source ↗</a>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-card-head">
-              <h3>Dinner Planner</h3>
-            </div>
-            <p>
-              A weekly meal-planning app for two people sharing a household:
-              add recipes by hand or import them from a URL, assign them to a
-              Mon–Sun plan together, and get one consolidated, categorised
-              shopping list for the week.
-            </p>
-            <p class="project-stack">
-              <strong>Stack:</strong> Node + TypeScript + Express with SQLite,
-              a React + Vite frontend, and Docker Compose.
-            </p>
-            <div class="project-card-foot">
-              <span class="project-badge project-badge-done">Home NAS deployment</span>
-              <a class="project-link" href="#lab">Start a demo ↓</a>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-card-head">
-              <h3>Vim Quest</h3>
-              <span class="project-badge project-badge-progress">In progress</span>
-            </div>
-            <p>
-              A browser platformer that teaches real Vim motions: you move an
-              ASCII character with actual Vim keybindings, and each of its 17
-              levels unlocks one new command family you then need to solve it.
-            </p>
-            <p class="project-stack">
-              <strong>Stack:</strong> Vite + vanilla TypeScript, no framework
-              and no backend; progress persists to localStorage.
-            </p>
-            <div class="project-card-foot">
-              <span class="project-badge project-badge-progress">Not yet deployed</span>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section id="experiments" class="section wrap">
-        <h2>Experiments</h2>
-        <p class="section-intro">
-          One small app a night, each in a language and an idea new to this
-          project, built by an AI agent while I sleep. They're plain static
-          pages, so they stay up.
+      <section id="contact" class="section contact wrap">
+        <h2 class="section-title reveal">Contact</h2>
+        <p class="contact-lead reveal">
+          Happy to hear about interesting work, or just to talk about software.
+          LinkedIn is the way in.
         </p>
-
-        <div id="experiments-list">
-          <noscript>
-            <p class="experiments-fallback">
-              The list needs JavaScript. Every night is published under
-              <a href="https://petterfranzen.github.io/ghost-in-the-machine/" target="_blank" rel="noopener noreferrer">ghost-in-the-machine</a>.
-            </p>
-          </noscript>
+        <div class="contact-actions reveal">
+          <a
+            class="button button-primary"
+            href="https://www.linkedin.com/in/petterf/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >linkedin.com/in/petterf <span aria-hidden="true">↗</span></a
+          >
+          <p class="contact-place">Stockholm, Sverige</p>
         </div>
-      </section>
-
-      <section id="lab" class="section wrap">
-        <h2>The Lab</h2>
-        <p class="lab-intro">
-          These projects run on a home NAS rather than a cloud host, so they
-          aren't left running around the clock. Start one here and it'll come
-          up for you — you can watch it boot, and it shuts itself down again
-          after an hour so it isn't left running by accident.
-        </p>
-
-        <div id="lab-projects" class="lab-projects">
-          <noscript>
-            <p class="lab-status">
-              The live status here needs JavaScript. The source for each
-              project is linked in the Projects section above.
-            </p>
-          </noscript>
-        </div>
-      </section>
-
-      <section id="contact" class="section wrap">
-        <h2>Contact</h2>
-        <p>Feel free to reach out on LinkedIn — I'm happy to hear about opportunities or just chat about software.</p>
-        <ul class="contact-list">
-          <li><span class="contact-label">Location:</span> Stockholm, Sverige</li>
-          <li><span class="contact-label">LinkedIn:</span> <a href="https://www.linkedin.com/in/petterf/" target="_blank" rel="noopener noreferrer">linkedin.com/in/petterf</a></li>
-        </ul>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div class="wrap">
-        <p>&copy; <span id="year"></span> Petter Franzén. Built with Vite + TypeScript.</p>
+      <div class="wrap footer-inner">
+        <p>&copy; <span id="year"></span> Petter Franzén</p>
+        <p class="footer-note">Built with Vite + TypeScript</p>
       </div>
     </footer>
 
