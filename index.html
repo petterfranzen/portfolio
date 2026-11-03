@@ -20,8 +20,7 @@
         <nav class="site-nav" id="site-nav" aria-label="Primary">
           <a href="#about">About</a>
           <a href="#projects">Projects</a>
-          <a href="#experiments">Experiments</a>
-          <a href="#lab">Lab</a>
+          <a href="#demos">Demos</a>
           <a href="#contact">Contact</a>
         </nav>
 
@@ -250,8 +249,7 @@
               restart-looping, failing its healthcheck, gone quiet, or
               suddenly spiking. The same service exposes a small API that
               starts, stops and updates the Compose projects it has been told
-              it may control, which is what the demo buttons in The Lab below
-              talk to.
+              it may control.
             </p>
             <p class="project-stack">
               <strong>Stack:</strong> Python 3 with the Docker SDK, FastAPI +
@@ -280,7 +278,7 @@
             </p>
             <div class="project-card-foot">
               <span class="project-badge project-badge-done">Home NAS deployment</span>
-              <a class="project-link" href="#lab">Start a demo ↓</a>
+              <a class="project-link" href="#demos">See it in the Demos ↓</a>
             </div>
           </article>
 
@@ -305,41 +303,33 @@
         </div>
       </section>
 
-      <section id="experiments" class="section wrap">
-        <h2>Experiments</h2>
-        <p class="section-intro">
-          One small app a night, each in a language and an idea new to this
-          project, built by an AI agent while I sleep. They're plain static
-          pages, so they stay up.
-        </p>
-
-        <div id="experiments-list">
-          <noscript>
-            <p class="experiments-fallback">
-              The list needs JavaScript. Every night is published under
-              <a href="https://petterfranzen.github.io/ghost-in-the-machine/" target="_blank" rel="noopener noreferrer">ghost-in-the-machine</a>.
-            </p>
-          </noscript>
-        </div>
-      </section>
-
-      <section id="lab" class="section wrap">
-        <h2>The Lab</h2>
+      <section id="demos" class="section wrap">
+        <h2>Demos</h2>
         <p class="lab-intro">
-          These projects run on a home NAS rather than a cloud host, so they
-          aren't left running around the clock. Start one here and it'll come
-          up for you — you can watch it boot, and it shuts itself down again
-          after an hour so it isn't left running by accident.
+          Small apps I've built, one a night, plus anything else that is live.
+          The list is read from a file baked into this site when it is built, so
+          there is no backend and no third-party script behind it.
         </p>
 
-        <div id="lab-projects" class="lab-projects">
+        <div id="demos-list" class="lab-projects">
           <noscript>
             <p class="lab-status">
-              The live status here needs JavaScript. The source for each
+              The experiments list needs JavaScript. The source for every
               project is linked in the Projects section above.
             </p>
           </noscript>
         </div>
+
+        <ul class="demo-links">
+          <li>
+            <a href="https://flight.pastabake.cloud/" target="_blank" rel="noopener noreferrer">Flight tracker</a>
+            &mdash; live ADS-B map and search, hosted on my own VM.
+          </li>
+          <li>
+            <a href="https://petterfranzen.github.io/ghost-in-the-machine/" target="_blank" rel="noopener noreferrer">ghost-in-the-machine</a>
+            &mdash; the whole run of nightly builds so far, on GitHub Pages.
+          </li>
+        </ul>
       </section>
 
       <section id="contact" class="section wrap">

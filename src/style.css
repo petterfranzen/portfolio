@@ -443,7 +443,7 @@ ul {
 
 /* Scoped to Projects: adding Docker Monitor took this to four cards, and
    four across at desktop left each one a tall, narrow column. Two up suits
-   the longer write-ups; the Lab's grid is left as it was. */
+   the longer write-ups; the Demos list has its own layout. */
 #projects .project-grid {
   /* min(24rem, 100%) lets the track shrink to the column when 24rem does not
      fit: 24rem is 384px, wider than the 342px a 390px phone leaves inside
@@ -598,95 +598,7 @@ ul {
   }
 }
 
-/* ---------- Experiments ---------- */
-
-.section-intro {
-  max-width: 52ch;
-  color: var(--color-text-muted);
-}
-
-.experiments-list {
-  list-style: none;
-  padding: 0;
-  margin: 1.5rem 0 0;
-  border-top: 1px solid var(--color-border);
-}
-
-.experiment {
-  border-bottom: 1px solid var(--color-border);
-}
-
-/* The whole row is the link: a night is one object, not a title plus a
-   separate "open" affordance. */
-.experiment-link {
-  display: grid;
-  grid-template-columns: 7rem 1fr;
-  gap: 0.15rem 1.5rem;
-  align-items: baseline;
-  padding: 0.85rem 0;
-  color: inherit;
-}
-
-.experiment-link:hover,
-.experiment-link:focus-visible {
-  text-decoration: none;
-}
-
-.experiment-link:hover .experiment-title,
-.experiment-link:focus-visible .experiment-title {
-  color: var(--color-accent);
-}
-
-.experiment-date {
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.experiment-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.experiment-head {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-}
-
-.experiment-title {
-  font-weight: 600;
-}
-
-.experiment-language {
-  color: var(--color-text-muted);
-  font-size: 0.8rem;
-}
-
-.experiment-idea {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  max-width: 60ch;
-}
-
-.experiments-more,
-.experiments-fallback {
-  margin-top: 1.25rem;
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  max-width: 62ch;
-}
-
-@media (max-width: 640px) {
-  .experiment-link {
-    grid-template-columns: 1fr;
-    gap: 0.15rem;
-  }
-}
-
-/* ---------- The Lab ---------- */
+/* ---------- Demos ---------- */
 
 .lab-intro {
   max-width: 52ch;
@@ -697,77 +609,19 @@ ul {
   margin-top: 1.5rem;
 }
 
-/* Reuses .project-card wholesale so a lab card and a project card are
-   visibly the same kind of object — this is the same project, shown live. */
-.lab-card .lab-phase {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  margin-bottom: 0.25rem;
-  /* Reserved height: the phase line appears and disappears as a stack
-     boots, and without this every card below it jumps each time. */
-  min-height: 1.2em;
-}
-
-.lab-lease,
-.lab-blocked {
-  font-size: 0.8rem !important;
-  color: var(--color-text-muted);
-  margin-bottom: 0;
-}
-
-.lab-notice {
-  background: var(--color-bg-alt);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 0.75rem 1rem;
-  font-size: 0.9rem;
-  margin-bottom: 1.25rem;
-}
-
 .lab-status {
   color: var(--color-text-muted);
   max-width: 52ch;
 }
 
-.lab-actions {
-  align-items: center;
-}
-
-.lab-button {
-  font-size: 0.85rem;
-  padding: 0.4rem 0.9rem;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.lab-button:hover:not(:disabled) {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
-
-.lab-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.lab-open {
-  font-size: 0.85rem;
-  padding: 0.4rem 0.9rem;
-}
-
-.lab-repo,
 .project-link {
   font-size: 0.8rem;
   color: var(--color-accent);
 }
 
-/* Scoped to project cards: the Lab's own buttons are fenced off. Padding
-   plus an equal negative margin widens the hit area to 44px without making
-   the flex row 44px tall and stretching the badge beside it. */
+/* Scoped to project cards. Padding plus an equal negative margin widens the
+   hit area to 44px without making the flex row 44px tall and stretching the
+   badge beside it. */
 .project-card-foot .project-link {
   display: inline-flex;
   align-items: center;
@@ -775,35 +629,43 @@ ul {
   margin: -0.55rem -0.75rem;
 }
 
-/* State pills reuse .project-badge for shape, and only vary colour. */
-.lab-state-running,
-.lab-state-partial {
-  background: var(--color-badge-done-bg);
-  color: var(--color-badge-done-text);
+/* Demos: the nightly experiments list, and the plain links beside it.
+   Replaces the Lab's card markup; .lab-projects / .lab-status above are still
+   used as its containers. */
+.demo-card {
+  display: grid;
+  grid-template-columns: 7.5em 1fr;
+  gap: 2px 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--color-border);
+  color: inherit;
+  text-decoration: none;
 }
 
-.lab-state-starting,
-.lab-state-stopping {
-  background: var(--color-badge-progress-bg);
-  color: var(--color-badge-progress-text);
+.demo-card:hover .demo-title {
+  color: var(--color-accent);
 }
 
-.lab-state-stopped {
-  background: var(--color-badge-idle-bg);
-  color: var(--color-badge-idle-text);
+.demo-date {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .lab-state-starting,
-  .lab-state-stopping {
-    animation: lab-pulse 1.6s ease-in-out infinite;
-  }
+.demo-lang {
+  grid-column: 2;
+  color: var(--color-text-muted);
+  font-size: 14px;
 }
 
-@keyframes lab-pulse {
-  50% {
-    opacity: 0.55;
-  }
+.demo-links {
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demo-links li {
+  border-top: 1px solid var(--color-border);
+  padding: 14px 0;
 }
 
 /* ---------- Phone text floor ----------
@@ -816,11 +678,7 @@ ul {
   .cv-location,
   .site-footer,
   .project-link,
-  .experiment-date,
-  .experiment-language,
-  .experiment-idea,
-  .experiments-more,
-  .experiments-fallback {
+  .demo-lang {
     font-size: 1rem;
   }
 

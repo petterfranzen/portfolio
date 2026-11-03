@@ -2,170 +2,124 @@
 
 Personal portfolio and CV website for Petter Franzén — a single-page static
 site with a hero/intro, an About/CV section (experience, education, skills),
-a projects showcase, an experiments list, the interactive Lab, and a contact
+a projects showcase, a list of demos and nightly experiments, and a contact
 section.
 
-## The Lab
+It is served as one static nginx container, live at
+<https://www.pastabake.cloud>.
 
-The projects here run on a home NAS, not a cloud host, so leaving them up
-around the clock costs real resources (and, for the flight tracker, real
-OpenSky API quota). The Lab section instead lets a visitor start one on
-demand:
+## Demos
 
-- Live state and, more usefully, a **phase** — "Populating data — global
-  sweep" rather than just "Running". A freshly started flight tracker
-  serves a page within seconds but shows an empty map for a minute while
-  it backfills, and the phase is what explains that rather than leaving it
-  looking broken.
-- The **Open demo** link is withheld until the stack is genuinely usable,
-  not merely healthy.
-- Every demo **stops itself after an hour**, with the countdown on the card.
-- One demo at a time; a visitor who arrives while another is running is
-  told so.
-
-None of this logic lives here. `src/lab.ts` renders what
-[docker-monitor](../docker-monitor)'s control API reports, and posts
-start/stop to it; the guest limits, leases and lifecycle are all enforced
-there. This site reaches it at `/lab-api/`, proxied by its own nginx (see
-`nginx.conf`) so the call is same-origin and docker-monitor is never
-exposed to the internet directly.
-
-With the NAS unreachable — it's a home server, it's sometimes off — the
-Lab says so and the rest of the page is unaffected.
-
-## Experiments
-
-The Experiments section lists the nightly apps from
+The Demos section lists the small apps built one a night in
 [ghost-in-the-machine](https://github.com/petterfranzen/ghost-in-the-machine),
-which are published on GitHub Pages. That list grows by one every night, so it
-is **generated at build time** rather than kept by hand here — and it is never
-fetched by the browser, so the section ships with the bundle and costs no
-requests.
+published on GitHub Pages, plus a plain link to anything else that is live
+(the flight tracker).
 
-`scripts/build-experiments.mjs` runs as `prebuild`, ahead of `tsc`, and makes
-two public reads of that repo: the `nights/` directory listing (which night
-folders actually exist) and `LOG.md` (the idea and the language for each). It
-writes `src/experiments.generated.ts`, which `src/experiments.ts` renders.
+The nightly list grows by one every night, so it is **baked at build time**
+rather than kept by hand here — and it is never fetched from GitHub by the
+browser, so the section ships with the site and costs no requests.
 
-That generated file is committed, so a build with no network still ships a
-list. When the reads fail — offline, or the API refusing — the script keeps the
-committed copy and warns rather than failing the build. Set `GITHUB_TOKEN` in
-the environment to lift the anonymous API rate limit if a build ever hits it.
+`scripts/build-experiments.py` bakes that list. It reads the public Pages
+index — the same page a visitor would see — and writes `public/experiments.json`,
+which `src/demos.ts` fetches same-origin and renders. It runs in the image
+build (`Dockerfile`) and in CI (`.github/workflows/ci.yml`), always before the
+build, because Vite copies `public/` into `dist/` as it builds. It fails soft on
+purpose: on any error it writes an empty list and the build continues, so a
+Pages blip leaves an empty section rather than a broken site.
+`public/experiments.json` is gitignored, so the copy in the repo can never go
+stale.
+
+There used to be an interactive **Lab** here, which started demo stacks on the
+home NAS through docker-monitor's control API via an nginx `/lab-api/` proxy.
+That is gone: this site now runs on a public VM, and publishing a
+container-control API on a public box is not a trade worth making. docker-monitor
+stays on the NAS for its alerting.
 
 ## Tech stack
 
 **Vite + vanilla TypeScript**, no UI framework.
 
-This is a content-first site whose only client-side state is a theme
-toggle, a mobile nav toggle, a footer year, and the Lab's project cards.
-That doesn't need React, Vue, or any component framework; it needs HTML,
-CSS, and a sprinkle of JS. The Lab re-renders a handful of cards when a
-server event lands, which is not a reason to introduce a framework. Vite gives a fast dev server with instant HMR and a tiny, dependency-free
-production build (a few KB of HTML/CSS/JS, no framework runtime to ship),
-and TypeScript adds just enough safety for the interactive bits without any
-real maintenance overhead. This keeps the dependency footprint minimal and
-the whole thing trivial to host anywhere that serves static files.
+This is a content-first site whose only client-side state is a theme toggle, a
+mobile nav toggle, a footer year, and the Demos list render. That doesn't need
+React, Vue, or any component framework; it needs HTML, CSS, and a sprinkle of
+JS. Vite gives a fast dev server with instant HMR and a tiny, dependency-free
+production build (a few KB of HTML/CSS/JS, no framework runtime to ship), and
+TypeScript adds just enough safety for the interactive bits without any real
+maintenance overhead. This keeps the dependency footprint minimal and the whole
+thing trivial to host anywhere that serves static files.
 
 ## Project structure
 
 ```
 index.html      Page markup and content (all sections live here)
 src/style.css   All styling, incl. light/dark theme tokens and responsive rules
-src/main.ts     Theme toggle, mobile nav toggle, footer year
-src/lab.ts      The Lab: live project status and start/stop, via /lab-api/
-src/experiments.ts             Experiments: renders the generated nightly list
-src/experiments.generated.ts   Generated at build time; do not edit by hand
-scripts/build-experiments.mjs  Builds that list from the ghost-in-the-machine repo
-public/         Static assets served as-is (favicon)
-nginx.conf      Serves the built site; proxies /lab-api/ to docker-monitor
+src/main.ts     Theme toggle, mobile nav toggle, footer year, demos
+src/demos.ts    Demos: renders the list baked into public/experiments.json
+scripts/build-experiments.py  Bakes that list from the ghost-in-the-machine index
+public/         Static assets served as-is (favicon); experiments.json is generated
+nginx.conf      Serves the built site, plus a plain /healthz
 Dockerfile      Build the bundle, serve it from nginx
-deploy/         NAS deployment (prebuilt image from GHCR)
-tests/lab.spec.mjs  One Playwright journey through the Lab
+deploy/         Deployment (prebuilt image from GHCR)
+tests/smoke.spec.mjs  One Playwright smoke test of the built site
 ```
 
 ## Running locally
 
 ```bash
 npm install
+python3 scripts/build-experiments.py   # bake the Demos list (optional)
 npm run dev
 ```
 
 This starts the Vite dev server (prints a local URL, typically
-`http://localhost:5173`) with hot module reload.
+`http://localhost:5173`) with hot module reload. Without the bake the Demos
+section says it has nothing to list; every other section is unaffected.
 
 Other scripts:
 
 ```bash
 npm run build     # type-check and build a production bundle into dist/
 npm run preview   # serve the production build locally to sanity-check it
-npm run test:lab  # Playwright journey through the Lab (needs the stack below)
+npm run test:smoke  # Playwright smoke test (needs a served build, see below)
 ```
 
-The Lab needs docker-monitor to talk to. Without it, the dev server still
-runs and every other section works — the Lab just reports the NAS as
-unreachable, which is exactly what a visitor would see.
-
-### Running the Lab locally
-
-Bring both containers up on a shared network so nginx can resolve
-`docker-monitor` by name, with a `projects.json` listing something
-startable (see docker-monitor's `projects.example.json`):
+To smoke-test a build:
 
 ```bash
-docker network create lab-test
-
-docker run -d --rm --name docker-monitor --network lab-test \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v "$PWD"/projects.json:/config/projects.json:ro \
-  -v "$PWD"/stacks:/stacks:ro \
-  -e PROJECTS_FILE=/config/projects.json -e TRUST_PROXY_HEADERS=true \
-  ghcr.io/petterfranzen/docker-monitor:latest
-
-docker build -t portfolio:test .
-docker run -d --rm --name portfolio --network lab-test -p 8099:80 portfolio:test
+python3 scripts/build-experiments.py
+npm run build
+npm run preview -- --port 8099 --strictPort &
+PORTFOLIO_URL=http://127.0.0.1:8099 npm run test:smoke
 ```
-
-Then `http://localhost:8099`, or `PORTFOLIO_URL=http://localhost:8099 npm
-run test:lab` to drive the journey test against it.
 
 ## Design notes
 
-- **Theming**: light/dark via CSS custom properties. Defaults to the
-  visitor's OS preference (`prefers-color-scheme`) and can be overridden
-  with the toggle in the header, which persists the choice in
-  `localStorage`.
+- **Theming**: light/dark via CSS custom properties. Defaults to the visitor's
+  OS preference (`prefers-color-scheme`) and can be overridden with the toggle
+  in the header, which persists the choice in `localStorage`.
 - **Responsive**: mobile-first layout with a collapsing nav (hamburger menu
-  below 640px), a CV layout that stacks from two columns to one, and a
-  project grid that reflows via `auto-fit`/`minmax`. Verified at both
-  desktop and mobile (390px) viewport widths.
+  below 640px), a CV layout that stacks from two columns to one, and a project
+  grid that reflows via `auto-fit`/`minmax`. Verified at both desktop and
+  mobile (390px) viewport widths.
+- **Reduced motion**: smooth scrolling is off when the visitor asks for it.
+- **Accessibility**: WCAG AA text contrast in both themes, a skip link, and a
+  44px tap floor on links and menu rows at phone widths.
 - **No backend.** Content lives directly in `index.html`, with one exception:
-  the Experiments list is generated at build time from the ghost-in-the-machine
-  repo (see above) and baked into the bundle. The browser never calls GitHub.
+  the Demos list is baked at build time (see above) and served as a static
+  file. The browser never calls GitHub.
 
 ## Content still to fill in
 
-Everything in the Projects section is real, and the "Coming soon" badges
-are gone — Dinner Planner and Vim Quest are both built and described
-properly now. The "About & CV" and "Contact" sections contain real
-content; no placeholders remain. Anything you want to change (photo,
-additional projects, updated experience) is plain HTML in `index.html`.
+Everything in the Projects section is real. The "About & CV" and "Contact"
+sections contain real content; no placeholders remain. Anything you want to
+change (photo, additional projects, updated experience) is plain HTML in
+`index.html`.
 
-Vim Quest is marked "Not yet deployed" rather than linked: it has no
-Dockerfile, so it can't appear in the Lab until it gets one.
+Vim Quest is marked "Not yet deployed" rather than linked: it has no public
+URL.
 
 ## Deployment
 
-Runs on the same home NAS as the other projects, as a container: CI builds
-an image and pushes it to GHCR, the NAS pulls it — the same pipeline
-flight-tracker and docker-monitor use. See [`deploy/README.md`](deploy/README.md).
-
-The Lab is why this is a container rather than a bucket of static files on
-Netlify or Pages: it needs an nginx in front to proxy `/lab-api/` to
-docker-monitor on the NAS's own network. A purely static host would mean
-exposing docker-monitor's API to the internet directly and dealing with
-CORS, which is a worse trade for something that can start and stop
-containers.
-
-**Before exposing this publicly**, read docker-monitor's "Security notes",
-particularly the `TRUST_PROXY_HEADERS` point — this nginx is the only
-intended way in, and the guest rate limits depend on that being true.
+Built and pushed to GHCR by CI, then pulled and run as a container — on the
+Hetzner VM for production, on the home NAS as the older route. See
+[`deploy/README.md`](deploy/README.md).
