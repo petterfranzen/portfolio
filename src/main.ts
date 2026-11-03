@@ -409,8 +409,17 @@ let activeIndex = 0;
 const jumpToAct = (id: string) => {
   const target = document.getElementById(id);
   if (!target) return;
+  // Inside a view transition the jump must be instant: the transition is the
+  // animation, and a smooth scroll would start after the new snapshot was
+  // taken, so the fade would show the old position. Without the API, scroll
+  // smoothly instead.
+  const useTransition =
+    typeof document.startViewTransition === "function" && !reduceMotion.matches;
   withTransition("act-jumping", () => {
-    target.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth", block: "start" });
+    target.scrollIntoView({
+      behavior: useTransition ? "instant" : "smooth",
+      block: "start",
+    });
   });
   setActiveAct(id);
   try {
