@@ -1,52 +1,300 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Petter Franzén: Engineering Manager, Principal Engineer and Solutions Architect." />
-    <meta name="theme-color" content="#0b0d17" />
-    <title>Petter Franzén</title>
+    <meta name="color-scheme" content="dark light" />
+    <meta
+      name="description"
+      content="Petter Franzén — Engineering Manager, Principal Engineer and Solutions Architect in Stockholm. An experimental team of AI agents that design, build and test software around the clock."
+    />
+    <title>Petter Franzén — Engineering Manager</title>
+    <script>
+      // Before first paint: mark that JS is running (so the boot sequence can
+      // start hidden) and apply the saved theme. Without JS neither happens and
+      // the page is simply a readable, stacked document.
+      (function () {
+        var root = document.documentElement;
+        root.classList.add("js");
+        try {
+          var saved = localStorage.getItem("theme");
+          if (saved === "light" || saved === "dark") root.dataset.theme = saved;
+          else if (matchMedia("(prefers-color-scheme: light)").matches)
+            root.dataset.theme = "light";
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
-    <div class="sky" aria-hidden="true">
-      <span class="orb orb-a"></span>
-      <span class="orb orb-b"></span>
-      <span class="orb orb-c"></span>
-      <span class="grid"></span>
+    <a class="skip-link" href="#act-1">Skip to content</a>
+
+    <div class="atmos" aria-hidden="true">
+      <div class="atmos-layer atmos-grid"></div>
+      <div class="atmos-layer atmos-glow"></div>
+      <div class="atmos-layer atmos-scan"></div>
     </div>
 
+    <header class="topbar">
+      <a class="brand" href="#act-1">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">Section 9</span>
+      </a>
+      <div class="topbar-actions">
+        <button
+          class="chip"
+          id="palette-open"
+          type="button"
+          aria-haspopup="dialog"
+          aria-keyshortcuts="k /"
+        >
+          <svg class="icon icon-jump" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 7h16M4 12h10M4 17h13" />
+            <circle cx="19" cy="12" r="2.2" />
+          </svg>
+          <span class="chip-label">Jump to</span>
+          <kbd aria-hidden="true">K</kbd>
+        </button>
+        <button
+          class="chip chip-icon"
+          id="theme-toggle"
+          type="button"
+          aria-label="Switch to light theme"
+          aria-pressed="false"
+        >
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M18.6 5.4l-1.8 1.8M7.2 16.8l-1.8 1.8" />
+          </svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M20 14.4A8.4 8.4 0 0 1 9.6 4a8.4 8.4 0 1 0 10.4 10.4Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <nav class="rail" aria-label="Acts">
+      <div class="rail-track" aria-hidden="true"><span class="rail-fill"></span></div>
+      <ol class="rail-list">
+        <li><a href="#act-1" data-act-link="1"><span class="rail-num">01</span><span class="rail-name">Boot</span></a></li>
+        <li><a href="#act-2" data-act-link="2"><span class="rail-num">02</span><span class="rail-name">Operating model</span></a></li>
+        <li><a href="#act-3" data-act-link="3"><span class="rail-num">03</span><span class="rail-name">Flight Tracker</span></a></li>
+        <li><a href="#act-4" data-act-link="4"><span class="rail-num">04</span><span class="rail-name">Nightly experiments</span></a></li>
+        <li><a href="#act-5" data-act-link="5"><span class="rail-num">05</span><span class="rail-name">Sign-off</span></a></li>
+      </ol>
+    </nav>
+
     <main id="main">
-      <header class="hero">
-        <p class="eyebrow">Stockholm</p>
-        <h1>Petter <span>Franzén</span></h1>
-        <p class="titles">Engineering Manager · Principal Engineer · Solutions Architect</p>
-        <p class="gigs">Recently: IAG / British Airways · notonthehighstreet</p>
-      </header>
+      <!-- Act 1 — Boot -->
+      <section class="act act-boot" id="act-1" data-act="1" aria-labelledby="name">
+        <div class="boot-inner">
+          <div class="term" aria-hidden="true">
+            <div class="term-bar">
+              <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+              <em>section9 — boot</em>
+            </div>
+            <pre class="term-body" id="boot-log"><!--bootlog--></pre>
+          </div>
 
-      <section class="work" aria-labelledby="work-title">
-        <h2 id="work-title" class="sr-only">Things I've built</h2>
+          <p class="eyebrow">Stockholm <span aria-hidden="true">·</span> Engineering leadership <span aria-hidden="true">·</span> Applied AI</p>
+          <h1 id="name" aria-label="Petter Franzén"><span class="decode" data-text="Petter Franzén" aria-hidden="true">Petter Franzén</span></h1>
+          <p class="titles">
+            Engineering Manager <span aria-hidden="true">·</span> Principal Engineer
+            <span aria-hidden="true">·</span> Solutions Architect
+          </p>
+          <p
+            class="pitch"
+            id="pitch"
+            data-pitch="Engineering leader. I run an experimental team of AI agents that design, build and test software around the clock, and I write up what works."
+          >
+            <span class="pitch-text">Engineering leader. I run an experimental team of AI agents that design, build and test software around the clock, and I write up what works.</span><span class="caret" aria-hidden="true"></span>
+          </p>
+          <p class="scroll-hint" aria-hidden="true"><span>Scroll</span><span class="hint-line"></span></p>
+        </div>
+      </section>
 
-        <a class="card card-feature" href="https://flight.pastabake.cloud" target="_blank" rel="noopener noreferrer">
-          <span class="card-tag">Live</span>
-          <h3>Flight Tracker</h3>
-          <p>Every aircraft in the sky, live on a map. Tap a plane for its type, operator and route.</p>
-          <span class="card-go">Open the app <span aria-hidden="true">→</span></span>
-        </a>
+      <!-- Act 2 — Operating model -->
+      <section class="act act-pin act-model" id="act-2" data-act="2" aria-labelledby="model-title">
+        <div class="pin">
+          <div class="act-head">
+            <p class="act-label"><span>02</span> Operating model</p>
+            <h2 id="model-title">A task enters.<br />Six steps later it ships.</h2>
+            <p class="act-lead">
+              The same loop every night, run by agents that don't get tired and
+              don't skip the tests.
+            </p>
+          </div>
 
-        <div class="card card-nightly">
-          <span class="card-tag">New every night</span>
-          <h3>Nightly experiments</h3>
-          <p>Small playable apps an AI builds while I sleep, each in a different language.</p>
-          <ul id="experiments" class="chips"></ul>
+          <ol class="pipeline" id="pipeline">
+            <li class="stage" data-stage="0">
+              <span class="stage-idx">01</span>
+              <h3>Intake</h3>
+              <p class="stage-role">the brief</p>
+              <p class="stage-line">A task lands with a definition of done and a deadline.</p>
+            </li>
+            <li class="stage" data-stage="1">
+              <span class="stage-idx">02</span>
+              <h3>Engineering</h3>
+              <p class="stage-role">Batou</p>
+              <p class="stage-line">Builds it. Small commits, tests before the push, no exceptions.</p>
+            </li>
+            <li class="stage" data-stage="2">
+              <span class="stage-idx">03</span>
+              <h3>Research</h3>
+              <p class="stage-role">Ishikawa</p>
+              <p class="stage-line">Reads the docs and the previous nights so the next attempt isn't a repeat.</p>
+            </li>
+            <li class="stage" data-stage="3">
+              <span class="stage-idx">04</span>
+              <h3>Architecture &amp; review</h3>
+              <p class="stage-role">Saito</p>
+              <p class="stage-line">Checks the shape of it: boundaries, failure modes, whether it belongs at all.</p>
+            </li>
+            <li class="stage" data-stage="4">
+              <span class="stage-idx">05</span>
+              <h3>QA</h3>
+              <p class="stage-role">Togusa</p>
+              <p class="stage-line">Drives it like a stranger would: on a phone, with the network off.</p>
+            </li>
+            <li class="stage" data-stage="5">
+              <span class="stage-idx">06</span>
+              <h3>Ship</h3>
+              <p class="stage-role">published</p>
+              <p class="stage-line">Merged, published, logged. Then the next task enters.</p>
+            </li>
+          </ol>
+
+          <dl class="stats" id="stats"><!--stats--></dl>
+        </div>
+      </section>
+
+      <!-- Act 3 — Flight Tracker -->
+      <section class="act act-flight" id="act-3" data-act="3" aria-labelledby="flight-title">
+        <canvas class="arcs" id="arcs" aria-hidden="true"></canvas>
+        <div class="flight-inner">
+          <div class="flight-copy">
+            <p class="act-label"><span>03</span> Live system</p>
+            <h2 id="flight-title">Flight Tracker</h2>
+            <p class="flight-line">
+              Every aircraft in the world, right now: positions, routes and
+              arrival status, with a position history I actually own.
+            </p>
+            <a
+              class="button"
+              href="https://flight.pastabake.cloud"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Open the live app <span aria-hidden="true">↗</span></a
+            >
+          </div>
+
+          <figure class="flight-shot">
+            <div class="shot-frame">
+              <img
+                class="shot shot-a"
+                src="/apps/flight-1.webp"
+                width="1440"
+                height="900"
+                alt="Flight Tracker: a dark map of northern Europe with hundreds of aircraft plotted as small cyan triangles."
+                decoding="async"
+              />
+              <img
+                class="shot shot-b"
+                src="/apps/flight-2.webp"
+                width="1440"
+                height="900"
+                alt=""
+                aria-hidden="true"
+                decoding="async"
+              />
+              <span class="shot-badge"><span class="live-dot" aria-hidden="true"></span>live</span>
+            </div>
+            <figcaption>flight.pastabake.cloud</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Act 4 — Nightly experiments -->
+      <section class="act act-pin act-nights" id="act-4" data-act="4" aria-labelledby="nights-title">
+        <div class="pin pin-nights">
+          <div class="act-head nights-head">
+            <p class="act-label"><span>04</span> Nightly experiments</p>
+            <h2 id="nights-title">One small thing, every night.</h2>
+            <p class="act-lead">
+              A new idea and a new language each night, built and tested while I
+              sleep.
+              <a
+                class="inline-link"
+                href="https://petterfranzen.github.io/ghost-in-the-machine/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >All of them <span aria-hidden="true">↗</span></a
+              >
+            </p>
+          </div>
+
+          <div class="strip-viewport" id="strip-viewport">
+            <div class="strip" id="strip">
+              <ol class="strip-track" id="strip-track"><!--experiments--></ol>
+            </div>
+            <div class="strip-center" aria-hidden="true"></div>
+          </div>
+
+          <p class="strip-hint">
+            <span class="strip-hint-desktop">Scroll to move the strip</span>
+            <span class="strip-hint-phone">Swipe the strip</span>
+            <span aria-hidden="true">·</span>
+            <span id="strip-count">6</span> nights
+          </p>
+        </div>
+      </section>
+
+      <!-- Act 5 — Sign-off -->
+      <section class="act act-signoff" id="act-5" data-act="5" aria-labelledby="signoff-title">
+        <div class="signoff-inner">
+          <p class="act-label"><span>05</span> Sign-off</p>
+          <h2 id="signoff-title">That's the loop.</h2>
+          <p class="signoff-line">
+            If you're building something that needs this kind of engineering
+            leadership, I'm on LinkedIn.
+          </p>
+          <a
+            class="button"
+            href="https://www.linkedin.com/in/petterf/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >linkedin.com/in/petterf <span aria-hidden="true">↗</span></a
+          >
+          <div class="signoff-foot">
+            <p>Petter Franzén <span aria-hidden="true">·</span> Stockholm</p>
+            <button class="link-button" id="theme-toggle-2" type="button">
+              Switch theme
+            </button>
+          </div>
         </div>
       </section>
     </main>
 
-    <footer class="foot">
-      <a href="https://www.linkedin.com/in/petterf/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-      <span>A new site is on its way.</span>
-    </footer>
+    <dialog class="palette" id="palette" aria-labelledby="palette-title">
+      <form method="dialog" class="palette-form">
+        <label class="sr-only" id="palette-title" for="palette-input">Jump to an act or an app</label>
+        <input
+          class="palette-input"
+          id="palette-input"
+          type="text"
+          role="combobox"
+          aria-expanded="true"
+          aria-controls="palette-list"
+          aria-autocomplete="list"
+          aria-activedescendant=""
+          placeholder="Jump to an act or an app…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <ul class="palette-list" id="palette-list" role="listbox" aria-label="Destinations"></ul>
+        <p class="palette-hint"><kbd>↑</kbd><kbd>↓</kbd> move <span aria-hidden="true">·</span> <kbd>Enter</kbd> go <span aria-hidden="true">·</span> <kbd>Esc</kbd> close</p>
+      </form>
+    </dialog>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

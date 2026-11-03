@@ -1,0 +1,47 @@
+{
+  "generated": "scripts/build-experiments.mjs",
+  "index": "https://petterfranzen.github.io/ghost-in-the-machine/",
+  "crew": "https://petterfranzen.github.io/ghost-in-the-machine/crew/",
+  "experiments": [
+    {
+      "date": "2026-11-01",
+      "slug": "2026-11-01-lantern-moss",
+      "title": "Lantern Moss",
+      "language": "Zig",
+      "idea": "A calm pixel-art clearing you explore with one thumb: gather three lost lights and wake an old stone.",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-01-lantern-moss/"
+    },
+    {
+      "date": "2026-10-31",
+      "slug": "2026-10-31-koi-drift",
+      "title": "Koi Drift",
+      "language": "Gleam",
+      "idea": "A still pond you feed with one thumb: tap and food drifts down, the koi glide over and the ripples spread and fade.",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-31-koi-drift/"
+    },
+    {
+      "date": "2026-10-30",
+      "slug": "2026-10-30-fireflies",
+      "title": "Fireflies",
+      "language": "Elm",
+      "idea": "A dusk meadow you fill with fireflies: one tap lifts a small hush of them, and they drift, blink and slowly fade.",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-30-fireflies/"
+    },
+    {
+      "date": "2026-10-29",
+      "slug": "2026-10-29-zen-rake",
+      "title": "Zen Rake",
+      "language": "Haxe",
+      "idea": "A zen sand garden you rake with one thumb; grooves settle behind the rake and slowly fade.",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-29-zen-rake/"
+    },
+    {
+      "date": "2026-10-28",
+      "slug": "2026-10-28-ripple-pool",
+      "title": "Ripple Pool",
+      "language": "Nim",
+      "idea": "A calm, one-handed tap-to-ripple pond with soft audio.",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-28-ripple-pool/"
+    }
+  ]
+}
