@@ -89,6 +89,11 @@ await check("the theme toggle switches and remembers", async () => {
   const { context, page } = await open();
   const before = await page.locator("html").getAttribute("data-theme");
   await page.locator("#theme-toggle").click();
+  // With View Transitions the new theme lands a frame later, so wait for it.
+  await page.waitForFunction(
+    (was) => document.documentElement.dataset.theme !== was,
+    before,
+  );
   const after = await page.locator("html").getAttribute("data-theme");
   assert.notEqual(before, after);
   await page.reload({ waitUntil: "networkidle" });

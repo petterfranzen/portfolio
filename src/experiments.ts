@@ -28,16 +28,21 @@ function escapeHtml(value: string): string {
 
 function item(night: Experiment): string {
   const url = escapeHtml(night.url);
+  // The link is the title, stretched over the whole card with ::after. That
+  // keeps the preview iframe out of the anchor — an iframe is interactive
+  // content and doesn't belong inside a link.
   return `
     <li class="experiment">
-      <a class="tile" href="${url}" target="_blank" rel="noopener noreferrer">
+      <div class="tile">
         <span class="tile-preview" data-preview="${url}"></span>
         <span class="tile-meta">
-          <span class="tile-title">${escapeHtml(night.title)}</span>
+          <span class="tile-title">
+            <a class="tile-link" href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(night.title)}</a>
+          </span>
           <span class="tile-idea">${escapeHtml(night.idea)}</span>
           <span class="tile-meta-foot">${escapeHtml(night.language)} · <time datetime="${escapeHtml(night.date)}">${escapeHtml(night.date)}</time></span>
         </span>
-      </a>
+      </div>
     </li>`;
 }
 

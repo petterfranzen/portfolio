@@ -1,37 +1,35 @@
 # Portfolio
 
-Personal portfolio and CV website for Petter Franzén — a single-page static
-site with a hero/intro, an About/CV section (experience, education, skills),
-a projects showcase, an experiments list, the interactive Lab, and a contact
-section.
+Personal site for Petter Franzén — a single static page: a parallax hero, two
+recent gigs in one line each, a showcase for the live Flight Tracker, and the
+nightly experiments as live-preview tiles.
 
-## The Lab
+No CV, no skills list, no education, no dates beyond the years. The point of
+the page is the apps: everything on it is something a visitor can open.
 
-The projects here run on a home NAS, not a cloud host, so leaving them up
-around the clock costs real resources (and, for the flight tracker, real
-OpenSky API quota). The Lab section instead lets a visitor start one on
-demand:
+## What's on it
 
-- Live state and, more usefully, a **phase** — "Populating data — global
-  sweep" rather than just "Running". A freshly started flight tracker
-  serves a page within seconds but shows an empty map for a minute while
-  it backfills, and the phase is what explains that rather than leaving it
-  looking broken.
-- The **Open demo** link is withheld until the stack is genuinely usable,
-  not merely healthy.
-- Every demo **stops itself after an hour**, with the countdown on the card.
-- One demo at a time; a visitor who arrives while another is running is
-  told so.
+- **Hero** — layered parallax (a glow, a grid and an outlined wordmark moving
+  at different rates) driven by CSS scroll-driven animations where the browser
+  supports them, with a small `requestAnimationFrame` fallback where it
+  doesn't.
+- **Work** — IAG / British Airways and notonthehighstreet, one line each.
+- **Apps** — Flight Tracker, with a cross-fading capture of the live app and a
+  link to it, then the nightly experiments.
+- **Contact** — LinkedIn and "Stockholm". Nothing else: no email, no phone, no
+  street address. Please keep it that way.
 
-None of this logic lives here. `src/lab.ts` renders what
-[docker-monitor](../docker-monitor)'s control API reports, and posts
-start/stop to it; the guest limits, leases and lifecycle are all enforced
-there. This site reaches it at `/lab-api/`, proxied by its own nginx (see
-`nginx.conf`) so the call is same-origin and docker-monitor is never
-exposed to the internet directly.
+## Effects, and the rules they follow
 
-With the NAS unreachable — it's a home server, it's sometimes off — the
-Lab says so and the rest of the page is unaffected.
+Four, and no more: the hero parallax, scroll-linked reveals, a cursor-follow
+spotlight on the apps section (desktop pointers only), and a View Transition on
+the theme toggle.
+
+All of them are off under `prefers-reduced-motion: reduce`, and none of them
+carry content: the reveal styles only apply behind a `js` class set in the
+document head, so with scripting off the page is simply a static, readable
+document. Contrast is checked at WCAG AA in both themes, tap targets are at
+least 44px, and the layout is verified at 320, 360 and 390px.
 
 ## Experiments
 
@@ -45,42 +43,47 @@ requests.
 `scripts/build-experiments.mjs` runs as `prebuild`, ahead of `tsc`, and makes
 two public reads of that repo: the `nights/` directory listing (which night
 folders actually exist) and `LOG.md` (the idea and the language for each). It
-writes `src/experiments.generated.ts`, which `src/experiments.ts` renders.
+writes `src/experiments.generated.ts`, which `src/experiments.ts` renders as
+tiles.
 
 That generated file is committed, so a build with no network still ships a
 list. When the reads fail — offline, or the API refusing — the script keeps the
 committed copy and warns rather than failing the build. Set `GITHUB_TOKEN` in
 the environment to lift the anonymous API rate limit if a build ever hits it.
 
+Each tile loads a live preview of the published page in an iframe, lazily and
+only once it is near the viewport. The iframe is inert (`pointer-events: none`,
+`tabindex="-1"`, `aria-hidden`), so it can't swallow a phone scroll — the tile
+itself is the link. Flight Tracker is *not* iframed: it may send
+`X-Frame-Options`, so the showcase uses captured stills instead.
+
 ## Tech stack
 
 **Vite + vanilla TypeScript**, no UI framework.
 
-This is a content-first site whose only client-side state is a theme
-toggle, a mobile nav toggle, a footer year, and the Lab's project cards.
-That doesn't need React, Vue, or any component framework; it needs HTML,
-CSS, and a sprinkle of JS. The Lab re-renders a handful of cards when a
-server event lands, which is not a reason to introduce a framework. Vite gives a fast dev server with instant HMR and a tiny, dependency-free
-production build (a few KB of HTML/CSS/JS, no framework runtime to ship),
-and TypeScript adds just enough safety for the interactive bits without any
-real maintenance overhead. This keeps the dependency footprint minimal and
-the whole thing trivial to host anywhere that serves static files.
+This is a content-first site whose only client-side state is a theme toggle, a
+mobile nav toggle, a footer year, the scroll effects and the lazy previews.
+That doesn't need React, Vue, or any component framework; it needs HTML, CSS,
+and a sprinkle of JS. Vite gives a fast dev server with instant HMR and a tiny,
+dependency-free production build (a few KB of HTML/CSS/JS, no framework runtime
+to ship), and TypeScript adds just enough safety for the interactive bits
+without any real maintenance overhead.
 
 ## Project structure
 
 ```
 index.html      Page markup and content (all sections live here)
-src/style.css   All styling, incl. light/dark theme tokens and responsive rules
-src/main.ts     Theme toggle, mobile nav toggle, footer year
-src/lab.ts      The Lab: live project status and start/stop, via /lab-api/
-src/experiments.ts             Experiments: renders the generated nightly list
+src/style.css   All styling: theme tokens, layout, the scroll effects
+src/main.ts     Theme toggle, mobile nav, footer year, reveals, parallax fallback
+src/experiments.ts             Experiments: renders the generated list as tiles
 src/experiments.generated.ts   Generated at build time; do not edit by hand
 scripts/build-experiments.mjs  Builds that list from the ghost-in-the-machine repo
+public/apps/    Captured stills of the live Flight Tracker
 public/         Static assets served as-is (favicon)
-nginx.conf      Serves the built site; proxies /lab-api/ to docker-monitor
+nginx.conf      Serves the built site
 Dockerfile      Build the bundle, serve it from nginx
 deploy/         NAS deployment (prebuilt image from GHCR)
-tests/lab.spec.mjs  One Playwright journey through the Lab
+tests/smoke.spec.mjs  One Playwright journey through the page
 ```
 
 ## Running locally
@@ -98,74 +101,39 @@ Other scripts:
 ```bash
 npm run build     # type-check and build a production bundle into dist/
 npm run preview   # serve the production build locally to sanity-check it
-npm run test:lab  # Playwright journey through the Lab (needs the stack below)
+npm test          # Playwright smoke test against a running preview
 ```
 
-The Lab needs docker-monitor to talk to. Without it, the dev server still
-runs and every other section works — the Lab just reports the NAS as
-unreachable, which is exactly what a visitor would see.
-
-### Running the Lab locally
-
-Bring both containers up on a shared network so nginx can resolve
-`docker-monitor` by name, with a `projects.json` listing something
-startable (see docker-monitor's `projects.example.json`):
+The smoke test needs a served build:
 
 ```bash
-docker network create lab-test
-
-docker run -d --rm --name docker-monitor --network lab-test \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v "$PWD"/projects.json:/config/projects.json:ro \
-  -v "$PWD"/stacks:/stacks:ro \
-  -e PROJECTS_FILE=/config/projects.json -e TRUST_PROXY_HEADERS=true \
-  ghcr.io/petterfranzen/docker-monitor:latest
-
-docker build -t portfolio:test .
-docker run -d --rm --name portfolio --network lab-test -p 8099:80 portfolio:test
+npm run build && npm run preview &
+PORTFOLIO_URL=http://localhost:4173 npm test
 ```
 
-Then `http://localhost:8099`, or `PORTFOLIO_URL=http://localhost:8099 npm
-run test:lab` to drive the journey test against it.
+It checks the content renders, the app links point at public apps, no email or
+phone number is published, the theme toggle works and persists, nothing throws,
+there is no sideways scroll at 320/360/390px, the page is readable with
+JavaScript off, and reduced motion leaves the content in place. Set
+`CHROMIUM_PATH` if the machine's Playwright browser lives somewhere unusual.
 
 ## Design notes
 
-- **Theming**: light/dark via CSS custom properties. Defaults to the
-  visitor's OS preference (`prefers-color-scheme`) and can be overridden
-  with the toggle in the header, which persists the choice in
-  `localStorage`.
-- **Responsive**: mobile-first layout with a collapsing nav (hamburger menu
-  below 640px), a CV layout that stacks from two columns to one, and a
-  project grid that reflows via `auto-fit`/`minmax`. Verified at both
-  desktop and mobile (390px) viewport widths.
+- **Theming**: dark by default, light on request. The choice persists in
+  `localStorage`; the toggle cross-fades between the two with a View
+  Transition where the browser supports it.
 - **No backend.** Content lives directly in `index.html`, with one exception:
   the Experiments list is generated at build time from the ghost-in-the-machine
   repo (see above) and baked into the bundle. The browser never calls GitHub.
-
-## Content still to fill in
-
-Everything in the Projects section is real, and the "Coming soon" badges
-are gone — Dinner Planner and Vim Quest are both built and described
-properly now. The "About & CV" and "Contact" sections contain real
-content; no placeholders remain. Anything you want to change (photo,
-additional projects, updated experience) is plain HTML in `index.html`.
-
-Vim Quest is marked "Not yet deployed" rather than linked: it has no
-Dockerfile, so it can't appear in the Lab until it gets one.
+- **No third-party runtime requests.** No web fonts, no analytics, no CDN. The
+  only external requests are the experiment previews, which are the point.
 
 ## Deployment
 
-Runs on the same home NAS as the other projects, as a container: CI builds
-an image and pushes it to GHCR, the NAS pulls it — the same pipeline
+Runs on the same home NAS as the other projects, as a container: CI builds an
+image and pushes it to GHCR, the NAS pulls it — the same pipeline
 flight-tracker and docker-monitor use. See [`deploy/README.md`](deploy/README.md).
 
-The Lab is why this is a container rather than a bucket of static files on
-Netlify or Pages: it needs an nginx in front to proxy `/lab-api/` to
-docker-monitor on the NAS's own network. A purely static host would mean
-exposing docker-monitor's API to the internet directly and dealing with
-CORS, which is a worse trade for something that can start and stop
-containers.
-
-**Before exposing this publicly**, read docker-monitor's "Security notes",
-particularly the `TRUST_PROXY_HEADERS` point — this nginx is the only
-intended way in, and the guest rate limits depend on that being true.
+`nginx.conf` still carries the `/lab-api/` proxy from the old Lab section. The
+page no longer uses it; it is left in place so this change doesn't touch the
+deployment path, and the Hetzner simplification removes it.
