@@ -9,7 +9,7 @@
   --color-border: #e2e2e8;
   --color-text: #1b1b1f;
   --color-text-muted: #55555f;
-  --color-accent: #2f6fed;
+  --color-accent: #2d6ae8;
   --color-accent-contrast: #ffffff;
   --color-badge-progress-bg: #fff4d6;
   --color-badge-progress-text: #8a6100;
@@ -88,6 +88,12 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   margin: 0;
   min-width: 0;
@@ -95,6 +101,8 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   line-height: 1.6;
+  /* Inherited by body copy; browsers without it break lines exactly as before. */
+  text-wrap: pretty;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -119,6 +127,7 @@ h3,
 h4 {
   line-height: 1.2;
   margin: 0 0 0.5em;
+  text-wrap: balance;
 }
 
 p {
@@ -175,6 +184,9 @@ ul {
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
 .brand:hover {
@@ -209,8 +221,9 @@ ul {
   background: var(--color-surface);
   color: var(--color-text);
   border-radius: 999px;
-  width: 2.5rem;
-  height: 2.5rem;
+  /* 44px: the smallest comfortable one-handed target. */
+  width: 2.75rem;
+  height: 2.75rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -290,15 +303,6 @@ ul {
   padding-block: clamp(3rem, 4vw + 1rem, 6rem);
   text-align: center;
   max-width: 44rem;
-}
-
-.eyebrow {
-  color: var(--color-accent);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-  font-size: 0.85rem;
-  margin-bottom: 0.5rem;
 }
 
 .hero h1 {
@@ -413,6 +417,8 @@ ul {
 
 .cv-entry ul {
   color: var(--color-text-muted);
+  /* Same measure as .bio: the 2fr column alone runs to ~95 characters a line. */
+  max-width: 38rem;
 }
 
 .skills-list {
@@ -433,6 +439,16 @@ ul {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   gap: 1.5rem;
+}
+
+/* Scoped to Projects: adding Docker Monitor took this to four cards, and
+   four across at desktop left each one a tall, narrow column. Two up suits
+   the longer write-ups; the Lab's grid is left as it was. */
+#projects .project-grid {
+  /* min(24rem, 100%) lets the track shrink to the column when 24rem does not
+     fit: 24rem is 384px, wider than the 342px a 390px phone leaves inside
+     .wrap, which pushed every card past the right edge. */
+  grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr));
 }
 
 .project-card {
@@ -493,6 +509,11 @@ ul {
   color: var(--color-badge-done-text);
 }
 
+.project-badge-live {
+  background: var(--color-badge-live-bg);
+  color: var(--color-badge-live-text);
+}
+
 /* ---------- Contact ---------- */
 
 .contact-list {
@@ -500,7 +521,20 @@ ul {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
+}
+
+/* The tap target is the link, so it carries the height, not the row. */
+.contact-list li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.contact-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
 .contact-label {
@@ -553,6 +587,102 @@ ul {
 
   .hero {
     padding-block: 2.5rem;
+  }
+
+
+  /* Menu links need a full-height row, not a 26px line of text. */
+  .site-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* ---------- Experiments ---------- */
+
+.section-intro {
+  max-width: 52ch;
+  color: var(--color-text-muted);
+}
+
+.experiments-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.experiment {
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* The whole row is the link: a night is one object, not a title plus a
+   separate "open" affordance. */
+.experiment-link {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 0.15rem 1.5rem;
+  align-items: baseline;
+  padding: 0.85rem 0;
+  color: inherit;
+}
+
+.experiment-link:hover,
+.experiment-link:focus-visible {
+  text-decoration: none;
+}
+
+.experiment-link:hover .experiment-title,
+.experiment-link:focus-visible .experiment-title {
+  color: var(--color-accent);
+}
+
+.experiment-date {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.experiment-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.experiment-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.experiment-title {
+  font-weight: 600;
+}
+
+.experiment-language {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.experiment-idea {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  max-width: 60ch;
+}
+
+.experiments-more,
+.experiments-fallback {
+  margin-top: 1.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  max-width: 62ch;
+}
+
+@media (max-width: 640px) {
+  .experiment-link {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
   }
 }
 
@@ -635,6 +765,16 @@ ul {
   color: var(--color-accent);
 }
 
+/* Scoped to project cards: the Lab's own buttons are fenced off. Padding
+   plus an equal negative margin widens the hit area to 44px without making
+   the flex row 44px tall and stretching the badge beside it. */
+.project-card-foot .project-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 0.75rem;
+  margin: -0.55rem -0.75rem;
+}
+
 /* State pills reuse .project-badge for shape, and only vary colour. */
 .lab-state-running,
 .lab-state-partial {
@@ -663,5 +803,28 @@ ul {
 @keyframes lab-pulse {
   50% {
     opacity: 0.55;
+  }
+}
+
+/* ---------- Phone text floor ----------
+   Declared last so it beats the base rules above on source order. These
+   carry content and would otherwise drop to 12.8-15.2px on a phone, under
+   the 16px house floor. Badges stay compact on purpose. */
+@media (max-width: 640px) {
+  .project-card p,
+  .cv-dates,
+  .cv-location,
+  .site-footer,
+  .project-link,
+  .experiment-date,
+  .experiment-language,
+  .experiment-idea,
+  .experiments-more,
+  .experiments-fallback {
+    font-size: 1rem;
+  }
+
+  .project-stack {
+    font-size: 1rem !important;
   }
 }

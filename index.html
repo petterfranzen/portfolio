@@ -20,6 +20,7 @@
         <nav class="site-nav" id="site-nav" aria-label="Primary">
           <a href="#about">About</a>
           <a href="#projects">Projects</a>
+          <a href="#experiments">Experiments</a>
           <a href="#lab">Lab</a>
           <a href="#contact">Contact</a>
         </nav>
@@ -50,7 +51,6 @@
 
     <main id="main">
       <section id="hero" class="hero wrap">
-        <p class="eyebrow">Hi, I'm</p>
         <h1>Petter Franzén</h1>
         <p class="tagline">Engineering Manager · Principal Engineer · Solutions Architect</p>
         <p class="bio">
@@ -220,22 +220,47 @@
               <h3>Flight Tracker</h3>
             </div>
             <p>
-              A live flight-tracking web app, self-hosted on a home NAS. It
-              tracks global air traffic in real time, plotting live aircraft
-              positions worldwide on an interactive map using data from the
-              OpenSky Network. Clicking an aircraft opens a dossier with
-              type, registration, operator, and route lookups, all kept live
-              via a WebSocket feed.
+              Live global flight tracking. An always-on sweep keeps a
+              position history current for every aircraft worldwide while a
+              faster poll follows whatever's actually on screen, so the map
+              stays live without pulling the whole world at once. Every
+              position is kept for 72 hours, which is what lets it derive
+              distance flown and airborne hours for any window straight from
+              that history, with no separate usage table to keep in sync.
             </p>
             <p class="project-stack">
-              <strong>Stack:</strong> Spring Boot (Java) backend split into
-              an API service and a polling agent, a React + TypeScript +
-              Leaflet frontend, PostgreSQL, and Docker Compose for
-              deployment.
+              <strong>Stack:</strong> Java 21 / Spring Boot in a single
+              process: REST, WebSocket and the pollers in one JVM, with
+              SQLite in WAL mode and a Vanilla TypeScript + MapLibre GL
+              frontend.
             </p>
             <div class="project-card-foot">
-              <span class="project-badge project-badge-done">Home NAS deployment</span>
-              <a class="project-link" href="#lab">Start a demo ↓</a>
+              <span class="project-badge project-badge-live">Live</span>
+              <a class="project-link" href="https://flight.pastabake.cloud" target="_blank" rel="noopener noreferrer">flight.pastabake.cloud ↗</a>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-card-head">
+              <h3>Docker Monitor</h3>
+            </div>
+            <p>
+              A small service that watches every container on my home NAS
+              and pushes an alert when one breaks: stopped unexpectedly,
+              restart-looping, failing its healthcheck, gone quiet, or
+              suddenly spiking. The same service exposes a small API that
+              starts, stops and updates the Compose projects it has been told
+              it may control, which is what the demo buttons in The Lab below
+              talk to.
+            </p>
+            <p class="project-stack">
+              <strong>Stack:</strong> Python 3 with the Docker SDK, FastAPI +
+              uvicorn for the control API, and ntfy for the notifications. No
+              build step.
+            </p>
+            <div class="project-card-foot">
+              <span class="project-badge project-badge-done">Home NAS service</span>
+              <a class="project-link" href="https://github.com/petterfranzen/docker-monitor" target="_blank" rel="noopener noreferrer">Source ↗</a>
             </div>
           </article>
 
@@ -277,6 +302,24 @@
               <span class="project-badge project-badge-progress">Not yet deployed</span>
             </div>
           </article>
+        </div>
+      </section>
+
+      <section id="experiments" class="section wrap">
+        <h2>Experiments</h2>
+        <p class="section-intro">
+          One small app a night, each in a language and an idea new to this
+          project, built by an AI agent while I sleep. They're plain static
+          pages, so they stay up.
+        </p>
+
+        <div id="experiments-list">
+          <noscript>
+            <p class="experiments-fallback">
+              The list needs JavaScript. Every night is published under
+              <a href="https://petterfranzen.github.io/ghost-in-the-machine/" target="_blank" rel="noopener noreferrer">ghost-in-the-machine</a>.
+            </p>
+          </noscript>
         </div>
       </section>
 
