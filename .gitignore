@@ -23,6 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Local Lab testing (see README's "Running the Lab locally")
-projects.json
-stacks/
+# Baked at build time by scripts/build-experiments.py (image build and CI);
+# never committed, so the file in the repo cannot go stale.
+public/experiments.json

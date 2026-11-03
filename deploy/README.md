@@ -1,48 +1,38 @@
-# Deploying the portfolio to the NAS
+# Deploying the portfolio
 
-Same pipeline as the sibling projects: CI builds the image, the NAS pulls
-it. Nothing is built on the NAS.
+## Production: the Hetzner VM at `www.pastabake.cloud`
 
-## 1. Publish the image
+The live site is pulled by the VM itself, not pushed to it: `agent-manager`'s
+`deploy/vm-sync.sh` (`portfolio_sync`) reads this repo's `main`, waits for its
+CI, pulls `ghcr.io/petterfranzen/portfolio:sha-<sha>`, pins the digest and
+recreates one container on `127.0.0.1:8081`. Merging to `main` is the whole
+deploy. It needs nothing here except two things, both already set:
+
+- the GHCR package is **public**, so the VM pulls without a token;
+- `main` carries tags `sha-<short>`, which `docker/metadata-action` already does.
+
+See `agent-manager/docs/DECISIONS.md` (2026-11-01). The VM's sync polls
+`/healthz`, which nginx answers with a plain `200 ok` — no version, no hostname.
+
+## The NAS route
+
+The pipeline is the same for the NAS: CI builds the image, the NAS pulls it.
+Nothing is built on the NAS. This is the older, home route; the NAS is also
+where docker-monitor runs.
+
+### 1. Publish the image
 
 Push to `main` (or run the workflow manually from the Actions tab). This
 builds for amd64 and arm64 and pushes to GHCR as
 `ghcr.io/petterfranzen/portfolio:latest`.
 
-## 2. Make the GHCR package pullable
+### 2. Make the GHCR package pullable
 
 GHCR packages are private by default — either make this one public
 (Package settings → Change visibility), or `docker login ghcr.io` on the
-NAS with a PAT carrying `read:packages`. Same choice as
-[flight-tracker's deploy README](../../flight-tracker/deploy/README.md)
-describes in more detail.
+NAS with a PAT carrying `read:packages`.
 
-## Simpler alternative: one combined stack
-
-If you're deploying the whole Lab at once — and especially if you're
-pasting YAML into UGOS's Docker app rather than using a terminal — use
-[`docker-monitor/deploy/lab-stack.yml`](../../docker-monitor/deploy/lab-stack.yml)
-instead of this file. It runs the socket proxy, ntfy, docker-monitor and
-this site as a single Compose project, so there's no external network to
-line up and no separate `projects.json` to place on disk.
-
-The rest of this file is the split-project route, where the portfolio is
-its own Compose project joining docker-monitor's network.
-
-## 3. Bring up docker-monitor first
-
-The Lab section talks to docker-monitor through this container's nginx, at
-the hostname `docker-monitor` on that project's compose network. So:
-
-```bash
-cd ~/docker-monitor && docker compose up -d
-docker network ls | grep docker-monitor   # confirm the network name
-```
-
-If the network isn't called `docker-monitor_default`, update the
-`networks:` block at the bottom of `docker-compose.yml` to match.
-
-## 4. Run it
+### 3. Run it
 
 ```bash
 cd ~/portfolio
@@ -52,21 +42,10 @@ docker compose up -d
 
 Open `http://<nas-ip>:8081` (or whatever `PORTFOLIO_PORT` you set).
 
-## 5. Turn on the proxy-header trust, once, over in docker-monitor
-
-The Lab's guest rate limits are counted per client IP, and docker-monitor
-only believes the `X-Forwarded-For` header when explicitly told to. Set
-`TRUST_PROXY_HEADERS=true` in docker-monitor's environment **only once
-this proxy is the way in** — i.e. once its own API port isn't reachable
-from outside the NAS. Getting this backwards means a visitor can forge the
-header and get a fresh identity per request, which defeats the limits
-entirely. docker-monitor's README says more under "Security notes".
-
-## Exposing it to the internet
+### Exposing it to the internet
 
 Whatever you use (tunnel, reverse proxy, port forward), point it at this
-container's port and **not** at docker-monitor's. The whole design assumes
-this nginx is the only door in.
-
-Terminate TLS in front of it: docker-monitor's `CONTROL_TOKEN` is a bearer
-token, and over plain HTTP anything on the path can read it.
+container's port. The container serves only the static site: there is no
+`/lab-api/` proxy to docker-monitor any more (see `../nginx.conf`), so nothing
+else is reachable through it and nothing needs to share a Docker network with
+it.
