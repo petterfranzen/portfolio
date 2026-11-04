@@ -173,6 +173,9 @@ function runBoot(): void {
   // 2. The pitch types in, in small bursts so it never feels like a spinner.
   function typePitch(): void {
     if (!pitchText || !pitch) return;
+    // Reveal the paragraph as it types; it was hidden only so the finished
+    // text did not flash before the boot sequence got there.
+    pitch.dataset.typed = "true";
     let cursor = 0;
     const step = () => {
       cursor = Math.min(finalPitch.length, cursor + 2);

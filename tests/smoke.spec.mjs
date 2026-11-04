@@ -132,7 +132,11 @@ await check("no sideways scroll at 1280, 390, 360 and 320", async () => {
 
 await check("reduced motion leaves the acts stacked and readable", async () => {
   const { context, page } = await open({ reducedMotion: "reduce" });
-  await page.waitForTimeout(300);
+  await page.waitForFunction(
+    () => document.querySelectorAll(".stage.is-live").length === 6,
+    null,
+    { timeout: 3000 },
+  );
   const positions = await page.locator(".act").evaluateAll((acts) =>
     acts.map((act) => getComputedStyle(act).position),
   );
@@ -174,6 +178,66 @@ await check("the command palette jumps to an act and closes", async () => {
   await page.keyboard.press("Enter");
   await page.waitForTimeout(900);
   assert.ok(!(await palette.isVisible()), "the palette stayed open");
+  await context.close();
+});
+
+await check("the flight capture cross-fades as its act is scrolled", async () => {
+  const { context, page } = await open();
+  const opacity = () =>
+    page.locator(".shot-b").evaluate((el) => Number(getComputedStyle(el).opacity));
+  const act = await page.evaluate(() => document.querySelector("#act-3").offsetTop);
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), act - 200);
+  await page.waitForFunction(
+    () => Number(getComputedStyle(document.querySelector(".shot-b")).opacity) < 0.05,
+    null,
+    { timeout: 3000 },
+  );
+  const before = await opacity();
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), act + 420);
+  await page.waitForFunction(
+    () => Number(getComputedStyle(document.querySelector(".shot-b")).opacity) > 0.9,
+    null,
+    { timeout: 3000 },
+  );
+  const after = await opacity();
+  assert.ok(before < 0.05, `the first capture should own the frame at the start (was ${before})`);
+  assert.ok(after > 0.9, `the second capture should fade in as the act is scrolled (was ${after})`);
+  await context.close();
+});
+
+await check("phone copy is 16px and the brand is a 44px target", async () => {
+  const { context, page } = await open({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const sizes = await page.evaluate(() => {
+    const px = (selector) => parseFloat(getComputedStyle(document.querySelector(selector)).fontSize);
+    return {
+      stage: px(".stage-line"),
+      lead: px(".act-lead"),
+      eyebrow: px(".eyebrow"),
+      idea: px(".tile-idea"),
+      brand: document.querySelector(".brand").getBoundingClientRect(),
+    };
+  });
+  for (const [name, size] of Object.entries(sizes)) {
+    if (name === "brand") continue;
+    assert.ok(size >= 16, `${name} copy is ${size}px on a phone`);
+  }
+  assert.ok(sizes.brand.width >= 44 && sizes.brand.height >= 44, `brand target is ${Math.round(sizes.brand.width)}x${Math.round(sizes.brand.height)}`);
+  await context.close();
+});
+
+await check("the rail reserves its own column at 1280", async () => {
+  const { context, page } = await open({ viewport: { width: 1280, height: 800 } });
+  const geometry = await page.evaluate(() => {
+    const rail = document.querySelector(".rail").getBoundingClientRect();
+    const content = ["#name", "#model-title", ".flight-copy", "#nights-title", "#signoff-title"]
+      .map((selector) => document.querySelector(selector).getBoundingClientRect())
+      .map((box) => ({ left: box.left, width: box.width }));
+    return { railRight: rail.right, railWidth: rail.width, content };
+  });
+  assert.ok(geometry.railWidth > 0, "the rail is not rendered at 1280");
+  for (const box of geometry.content) {
+    assert.ok(box.left >= geometry.railRight, `content starts at ${Math.round(box.left)}, rail ends at ${Math.round(geometry.railRight)}`);
+  }
   await context.close();
 });
 
