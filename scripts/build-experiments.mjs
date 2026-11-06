@@ -16,10 +16,14 @@
  * It fails soft on purpose: with no network, or when the API refuses, the
  * previously generated file is kept so the build still ships a site — a stale
  * list beats a broken one. Set GITHUB_TOKEN to lift the anonymous rate limit.
+ *
+ * Pass --check to verify instead of build: it rebuilds the list and fails
+ * (exit 1) if the committed file has drifted from ghost-in-the-machine, or if
+ * the repo can't be reached — CI runs it so the list can't go stale quietly.
  */
 
 import { existsSync } from "node:fs";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -95,6 +99,9 @@ function titleFromSlug(slug) {
     .join(" ");
 }
 
+/** --check: verify the committed list instead of writing it. */
+const CHECK = process.argv.includes("--check");
+
 async function main() {
   let nights;
   try {
@@ -122,6 +129,13 @@ async function main() {
     }
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
+    if (CHECK) {
+      // A list we cannot rebuild is a list we cannot vouch for.
+      console.error(`build-experiments: cannot reach ghost-in-the-machine: ${reason}`);
+      console.error("build-experiments: cannot verify the committed list");
+      process.exitCode = 1;
+      return;
+    }
     if (existsSync(OUT)) {
       console.warn(`build-experiments: ${reason}`);
       console.warn("build-experiments: keeping the committed list");
@@ -138,7 +152,25 @@ async function main() {
     crew: `${PAGES_BASE}/crew/`,
     experiments: nights,
   };
-  await writeFile(OUT, `${JSON.stringify(payload, null, 2)}\n`);
+  const rendered = `${JSON.stringify(payload, null, 2)}\n`;
+
+  if (CHECK) {
+    const committed = existsSync(OUT) ? await readFile(OUT, "utf8") : "";
+    if (committed !== rendered) {
+      console.error(
+        `build-experiments: the committed list is out of date — ghost-in-the-machine now has ${nights.length} night(s)`,
+      );
+      console.error(
+        "build-experiments: run `npm run experiments` and commit src/experiments.generated.json",
+      );
+      process.exitCode = 1;
+      return;
+    }
+    console.log(`build-experiments: list is up to date (${nights.length} night(s))`);
+    return;
+  }
+
+  await writeFile(OUT, rendered);
   console.log(
     `build-experiments: ${nights.length} night(s) -> ${path.relative(process.cwd(), OUT)}`,
   );
