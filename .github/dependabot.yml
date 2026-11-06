@@ -1,0 +1,9 @@
+version: 2
+updates:
+  # Base images in the Dockerfile are pinned by digest; this keeps the pins
+  # moving without anyone hand-editing a sha256.
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
