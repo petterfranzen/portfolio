@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Batou",
+    "role": "Engineering",
+    "line": "Builds it. Small commits, tests before the push, no exceptions."
+  },
+  {
+    "name": "Ishikawa",
+    "role": "Research",
+    "line": "Reads the docs and the previous nights so the next attempt isn't a repeat."
+  },
+  {
+    "name": "Saito",
+    "role": "Architecture and review",
+    "line": "Checks the shape of it: boundaries, failure modes, whether it belongs at all."
+  },
+  {
+    "name": "Togusa",
+    "role": "Quality assurance",
+    "line": "Drives it like a stranger would: on a phone, with the network off."
+  },
+  {
+    "name": "Tachikoma",
+    "role": "Nightly experiments",
+    "line": "Ships one small interactive piece a night, in a language it hasn't used yet."
+  }
+]

@@ -1,61 +1,34 @@
 /**
- * The Experiments section: the nightly apps from ghost-in-the-machine.
+ * The nightly experiments, as read from the build-time list.
  *
- * The list is generated at build time (scripts/build-experiments.mjs) and
- * imported as data, so nothing is fetched from GitHub at runtime — the section
- * ships with the bundle and costs no requests. Same reasoning as the Lab:
- * vanilla TypeScript, a short render, no framework.
+ * src/experiments.generated.json is written by scripts/build-experiments.mjs
+ * before every build; it is committed so an offline build still ships a list.
+ * index.html gets the same data baked in by the Vite plugin in vite.config.ts,
+ * so the page reads without JavaScript; this module feeds the interactive
+ * filmstrip on top of it.
  */
+import data from "./experiments.generated.json";
 
-import {
-  CREW_URL,
-  EXPERIMENTS,
-  EXPERIMENTS_INDEX,
-  type Experiment,
-} from "./experiments.generated.js";
-
-/** Night titles and ideas come from the repo as text, so they're escaped. */
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+export interface Experiment {
+  /** Date of the night, "YYYY-MM-DD". */
+  date: string;
+  /** Folder in the source repo, "YYYY-MM-DD-<slug>". */
+  slug: string;
+  /** Display title derived from the slug, e.g. "Koi Drift". */
+  title: string;
+  /** Language it was written in. */
+  language: string;
+  /** One line on the idea, from the repo's LOG.md. */
+  idea: string;
+  /** The published page for this night. */
+  url: string;
 }
 
-function item(night: Experiment): string {
-  return `
-    <li class="experiment">
-      <a class="experiment-link" href="${escapeHtml(night.url)}" target="_blank" rel="noopener noreferrer">
-        <time class="experiment-date" datetime="${escapeHtml(night.date)}">${escapeHtml(night.date)}</time>
-        <span class="experiment-body">
-          <span class="experiment-head">
-            <span class="experiment-title">${escapeHtml(night.title)}</span>
-            <span class="experiment-language">${escapeHtml(night.language)}</span>
-          </span>
-          <span class="experiment-idea">${escapeHtml(night.idea)}</span>
-        </span>
-      </a>
-    </li>`;
-}
+/** Every night so far, newest first. */
+export const EXPERIMENTS: Experiment[] = data.experiments;
 
-export function setupExperiments(): void {
-  const container = document.getElementById("experiments-list");
-  if (!container) return;
+/** The index for the whole run. */
+export const EXPERIMENTS_INDEX: string = data.index;
 
-  if (EXPERIMENTS.length === 0) {
-    container.innerHTML = `<p class="experiments-fallback">The nightly builds are published in <a href="${EXPERIMENTS_INDEX}" target="_blank" rel="noopener noreferrer">ghost-in-the-machine</a>.</p>`;
-    return;
-  }
-
-  container.innerHTML = `
-    <ul class="experiments-list">
-      ${EXPERIMENTS.map(item).join("")}
-    </ul>
-    <p class="experiments-more">
-      Everything is public:
-      <a href="${EXPERIMENTS_INDEX}" target="_blank" rel="noopener noreferrer">the whole run so far</a>
-      and <a href="${CREW_URL}" target="_blank" rel="noopener noreferrer">the crew behind it</a>:
-      five agents on Section 9 callsigns and all.
-    </p>`;
-}
+/** The crew page: who builds the nights. */
+export const CREW_URL: string = data.crew;
