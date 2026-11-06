@@ -1,0 +1,54 @@
+name: CI
+
+# Verifies every pull request before it can merge: the site type-checks and
+# builds, the build-time night list still matches ghost-in-the-machine, and the
+# smoke test passes against a preview of the real build. Publishing the image
+# is a separate workflow (docker-publish.yml), on main only.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    # The night list is read from ghost-in-the-machine's public API; the
+    # workflow's own token lifts the anonymous rate limit. No other secrets.
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Before the build, while the working tree still matches the commit:
+      # rebuild the list from ghost-in-the-machine and fail if it drifted.
+      - name: Check the night list is not stale
+        run: npm run experiments:check
+
+      - name: Type-check and build
+        run: npm run build
+
+      - name: Install the browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke test against a preview
+        run: |
+          npm run preview -- --port 4173 --strictPort &
+          for _ in $(seq 1 30); do
+            curl -sf http://localhost:4173/ >/dev/null && break
+            sleep 1
+          done
+          curl -sf http://localhost:4173/ >/dev/null || {
+            echo "preview did not come up on :4173"
+            exit 1
+          }
+          PORTFOLIO_URL=http://localhost:4173 npm run test:lab
