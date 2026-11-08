@@ -1,6 +1,7 @@
 import "./style.css";
 import { initFlightArcs } from "./flight.js";
 import { EXPERIMENTS, EXPERIMENTS_INDEX } from "./experiments.js";
+import { initTheme, withTransition } from "./theme.js";
 
 const $ = <T extends Element = HTMLElement>(selector: string, root: ParentNode = document) =>
   root.querySelector<T>(selector);
@@ -13,77 +14,11 @@ const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 /* --------------------------------------------------------------------------
-   View transitions. Everything that swaps the page in place — the theme, a
-   jump between acts — goes through here, and degrades to an instant change
-   where the API or the visitor's motion preference says no.
+   Theme and view transitions live in src/theme.ts, shared with the plain
+   prose page; this page just wires the same controls up.
    -------------------------------------------------------------------------- */
 
-function withTransition(className: string, update: () => void): void {
-  if (typeof document.startViewTransition !== "function" || reduceMotion.matches) {
-    update();
-    return;
-  }
-  // The callback must run exactly once: some browsers decline or abort a
-  // transition (a hidden document, one already in flight), and a skipped
-  // callback would mean the theme simply doesn't change. So run it up front
-  // and let the transition snapshot the result, with a timer as a last resort.
-  let applied = false;
-  const run = () => {
-    if (applied) return;
-    applied = true;
-    update();
-  };
-  const clean = () => root.classList.remove(className);
-  root.classList.add(className);
-  try {
-    const transition = document.startViewTransition(run);
-    transition.finished.then(clean, clean);
-  } catch {
-    run();
-    clean();
-  }
-  window.setTimeout(run, 350);
-  window.setTimeout(clean, 1000);
-}
-
-/* --------------------------------------------------------------------------
-   Theme. The saved choice wins; otherwise the OS preference decides. Both
-   toggles in the page drive the same state.
-   -------------------------------------------------------------------------- */
-
-const themeButtons = $$<HTMLButtonElement>("#theme-toggle, #theme-toggle-2");
-
-function paintTheme(): void {
-  const light = root.dataset.theme === "light";
-  for (const button of themeButtons) {
-    const label = light ? "Switch to dark theme" : "Switch to light theme";
-    if (button.id === "theme-toggle") {
-      button.setAttribute("aria-label", label);
-      button.setAttribute("aria-pressed", String(light));
-    } else {
-      button.textContent = light ? "Dark theme" : "Light theme";
-      button.setAttribute("aria-label", label);
-    }
-  }
-  const meta = $<HTMLMetaElement>('meta[name="theme-color"]');
-  if (meta) meta.content = light ? "#edf2ef" : "#04070a";
-}
-
-function toggleTheme(): void {
-  const next = root.dataset.theme === "light" ? "dark" : "light";
-  withTransition("theme-swapping", () => {
-    root.dataset.theme = next;
-    try {
-      localStorage.setItem("theme", next);
-    } catch {
-      /* private mode: the choice just doesn't persist */
-    }
-  });
-  paintTheme();
-}
-
-for (const button of themeButtons) button.addEventListener("click", toggleTheme);
-paintTheme();
+initTheme();
 
 /* --------------------------------------------------------------------------
    Atmosphere: pointer depth on a fine pointer, nothing on touch. Two custom
@@ -378,10 +313,12 @@ for (const tile of tiles) {
 
 interface Destination {
   label: string;
-  kind: "Act" | "App" | "Nightly";
+  kind: "Act" | "App" | "Page" | "Nightly";
   href?: string;
   act?: string;
   external?: boolean;
+  /** A page of this site, opened in place rather than in a new tab. */
+  internal?: boolean;
   index?: number;
 }
 
@@ -391,6 +328,7 @@ const destinations: Destination[] = [
   { label: "Flight Tracker", kind: "Act", act: "act-3", index: 3 },
   { label: "Nightly experiments", kind: "Act", act: "act-4", index: 4 },
   { label: "Sign-off", kind: "Act", act: "act-5", index: 5 },
+  { label: "How this was built — about the crew", kind: "Page", href: "/how-this-was-built/", internal: true },
   { label: "Flight Tracker — open the live app", kind: "App", href: "https://flight.pastabake.cloud", external: true },
   { label: "Nightly experiments — all of them", kind: "App", href: EXPERIMENTS_INDEX, external: true },
   ...EXPERIMENTS.map((night) => ({
@@ -440,6 +378,8 @@ const go = (destination: Destination) => {
   palette?.close();
   if (destination.act) {
     jumpToAct(destination.act);
+  } else if (destination.internal && destination.href) {
+    window.location.assign(destination.href);
   } else if (destination.href) {
     openExternal(destination.href);
   }
@@ -481,7 +421,12 @@ function renderPalette(filter = ""): void {
 
     const kind = document.createElement("span");
     kind.className = "palette-kind";
-    kind.textContent = destination.kind === "Act" ? "Act" : "Open ↗";
+    kind.textContent =
+      destination.kind === "Act"
+        ? "Act"
+        : destination.kind === "Page"
+          ? "Go"
+          : "Open ↗";
     item.append(kind);
 
     if (destination.external) {
