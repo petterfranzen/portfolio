@@ -89,13 +89,14 @@ npm run dev
 Other scripts:
 
 ```bash
-npm run build     # generate the night list, type-check, build into dist/
-npm run preview   # serve the production build locally
-npm test          # the smoke test, against a running preview
+npm run build            # generate the night list, type-check, build into dist/
+npm run preview          # serve the production build locally
+npm run test:lab         # the smoke test, against a running preview
+npm run experiments:check  # fail if the committed night list is stale
 ```
 
 The smoke test needs a server: `npm run build && npm run preview`, then in
-another shell `PORTFOLIO_URL=http://localhost:4173 npm test`.
+another shell `PORTFOLIO_URL=http://localhost:4173 npm run test:lab`.
 
 ## Accessibility and motion
 
@@ -108,6 +109,15 @@ another shell `PORTFOLIO_URL=http://localhost:4173 npm test`.
   content. Previews are never autoplayed.
 - With JavaScript off the page is a plain readable document; the boot text, the
   pipeline, both showcases and the sign-off are all in the HTML.
+
+## Continuous integration
+
+Every pull request runs `.github/workflows/ci.yml`: `tsc` and a production
+build, `npm run experiments:check` (which fails if `src/experiments.generated.json`
+has drifted from ghost-in-the-machine), then the smoke test against a
+`vite preview` of the built site. It reads the repository with the workflow's
+own `GITHUB_TOKEN`, so the nightly list can't go stale without a red build.
+Publishing the image stays a separate workflow, `docker-publish.yml`, on `main`.
 
 ## Deployment
 

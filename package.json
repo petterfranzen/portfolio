@@ -14,7 +14,8 @@
     "prebuild": "npm run experiments",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test:lab": "node tests/lab.spec.mjs"
+    "test:lab": "node tests/smoke.spec.mjs",
+    "experiments:check": "node scripts/build-experiments.mjs --check"
   },
   "devDependencies": {
     "playwright": "^1.62.1",

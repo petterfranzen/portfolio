@@ -4,6 +4,14 @@
   "crew": "https://petterfranzen.github.io/ghost-in-the-machine/crew/",
   "experiments": [
     {
+      "date": "2026-11-05",
+      "slug": "2026-11-05-songbranch",
+      "title": "Songbranch",
+      "language": "Go",
+      "idea": "A pixel-art dusk tree: tap a bird and it hops to the next branch and sings one soft note, and the whole tree settles.",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-05-songbranch/"
+    },
+    {
       "date": "2026-11-01",
       "slug": "2026-11-01-lantern-moss",
       "title": "Lantern Moss",
