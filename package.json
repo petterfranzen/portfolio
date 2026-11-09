@@ -15,6 +15,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test:lab": "node tests/smoke.spec.mjs",
+    "test:headers": "node tests/security-headers.spec.mjs",
     "experiments:check": "node scripts/build-experiments.mjs --check"
   },
   "devDependencies": {
