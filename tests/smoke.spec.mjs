@@ -222,6 +222,19 @@ await check("phone copy is 16px and the brand is a 44px target", async () => {
     assert.ok(size >= 16, `${name} copy is ${size}px on a phone`);
   }
   assert.ok(sizes.brand.width >= 44 && sizes.brand.height >= 44, `brand target is ${Math.round(sizes.brand.width)}x${Math.round(sizes.brand.height)}`);
+
+  // The wordmark and the "Jump to" label are too wide for a phone, so they are
+  // hidden visually — but they carry the controls' accessible names, and a
+  // display:none would leave the button and the link unnamed (Lighthouse's
+  // button-name and link-name audits). Pin the rendered text, not the text
+  // content, so hiding by display:none fails here.
+  const named = {
+    brand: (await page.locator(".brand").innerText()).trim(),
+    jump: (await page.locator("#palette-open").innerText()).trim(),
+  };
+  assert.ok(named.brand.length > 0, "the brand link has no rendered text, so no accessible name, on a phone");
+  assert.ok(named.jump.length > 0, "the jump button has no rendered text, so no accessible name, on a phone");
+
   await context.close();
 });
 
@@ -251,6 +264,147 @@ await check("the theme switch flips the document theme", async () => {
   assert.ok(["light", "dark"].includes(after));
   await context.close();
 });
+
+await check("keyboard only: the skip link, then the five acts", async () => {
+  const { context, page } = await open({ viewport: { width: 1280, height: 800 } });
+  await page.keyboard.press("Tab");
+  const first = await page.evaluate(() => ({
+    cls: document.activeElement?.className ?? "",
+    href: document.activeElement?.getAttribute?.("href") ?? "",
+  }));
+  assert.match(first.cls, /skip-link/, `the first Tab landed on "${first.cls}", not the skip link`);
+  const box = await page.locator(".skip-link").boundingBox();
+  assert.ok(box && box.width > 0 && box.height > 0, "the skip link is not visible while focused");
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() => location.hash === "#act-1", null, { timeout: 4000 });
+
+  const walked = [];
+  for (let guard = 0; walked.length < 5 && guard < 40; guard += 1) {
+    await page.keyboard.press("Tab");
+    const act = await page.evaluate(() => {
+      const el = document.activeElement;
+      return el instanceof HTMLElement ? el.dataset.actLink ?? null : null;
+    });
+    if (!act) continue;
+    walked.push(act);
+    await page.keyboard.press("Enter");
+    await page.waitForFunction((id) => location.hash === id, `#act-${act}`, { timeout: 4000 });
+    const current = await page.evaluate(
+      (id) => document.querySelector(`[data-act-link="${id}"]`)?.getAttribute("aria-current"),
+      act,
+    );
+    assert.equal(current, "true", `act ${act} is not marked as current after the jump`);
+  }
+  assert.deepEqual(walked, ["1", "2", "3", "4", "5"], `the rail walked ${walked.join(",")} by keyboard`);
+  await context.close();
+});
+
+await check("keyboard only: the nightly list is reachable and named", async () => {
+  const { context, page } = await open({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const nights = Number(await page.locator("#strip-count").innerText());
+  assert.ok(nights > 0, "the strip reports no nights");
+  const reached = [];
+  for (let guard = 0; reached.length < nights && guard < 80; guard += 1) {
+    await page.keyboard.press("Tab");
+    const name = await page.evaluate(() => {
+      const link = document.activeElement?.closest?.("a.tile-link");
+      if (!link) return null;
+      const title = link.querySelector(".tile-title")?.textContent?.trim() ?? "";
+      const text = (link.getAttribute("aria-label") ?? link.textContent ?? "").replace(/\s+/g, " ").trim();
+      return { title, text };
+    });
+    if (!name) continue;
+    assert.ok(name.text.length > 0, "a nightly link has no accessible name");
+    assert.ok(name.title.length > 0, "a nightly link has no visible title");
+    reached.push(name.title);
+  }
+  assert.equal(reached.length, nights, `reached ${reached.length} of ${nights} nights by keyboard`);
+  await context.close();
+});
+
+await check("the footer links to a working How this was built page", async () => {
+  const { context, page } = await open();
+  const link = page.locator("footer a[href='/how-this-was-built/']");
+  assert.equal(await link.count(), 1, "the footer does not link to /how-this-was-built/");
+  const text = await link.innerText();
+  assert.match(text, /How this was built/);
+  const footer = await page.locator("footer").evaluate((el) => el.tagName.toLowerCase());
+  assert.equal(footer, "footer");
+  await context.close();
+});
+
+await check("the command palette lists the How this was built page", async () => {
+  const { context, page } = await open();
+  await page.keyboard.press("k");
+  await page.locator("#palette-input").fill("how this");
+  await page.waitForTimeout(150);
+  const labels = await page.locator(".palette-item").allInnerTexts();
+  assert.ok(
+    labels.some((label) => /How this was built/.test(label)),
+    `the palette found ${JSON.stringify(labels)}`,
+  );
+  await page.keyboard.press("Escape");
+  await context.close();
+});
+
+await check("the How this was built page reads and stays public-safe", async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  const errors = [];
+  page.on("console", (message) => {
+    if (message.type() !== "error") return;
+    if (!message.location().url.startsWith(BASE)) return;
+    errors.push(message.text());
+  });
+  page.on("pageerror", (error) => errors.push(error.message));
+  const response = await page.goto(`${BASE}/how-this-was-built/`, { waitUntil: "networkidle" });
+  assert.equal(response?.status(), 200);
+  assert.match(await page.title(), /How this was built/);
+  assert.equal((await page.locator("h1").innerText()).trim(), "How this was built");
+
+  const words = (await page.locator("main").innerText()).split(/\s+/).filter(Boolean).length;
+  assert.ok(words >= 400 && words <= 600, `the page runs to ${words} words, outside 400-600`);
+
+  const text = await page.locator("body").innerText();
+  assert.ok(!/@[a-z0-9-]+\.[a-z]{2,}/i.test(text), "an email address is on the page");
+  assert.ok(!/\b\d{1,3}(?:\.\d{1,3}){3}\b/.test(text), "an IP address is on the page");
+  assert.ok(!/\b(?:sk-|ghp_|gho_|github_pat_|Bearer )/i.test(text), "something token-shaped is on the page");
+  for (const name of ["Google", "Amazon", "Spotify", "Klarna", "Ericsson", "Microsoft", "Apple", "Meta"]) {
+    assert.ok(!new RegExp(`\\b${name}\\b`, "i").test(text), `a company name is on the page: ${name}`);
+  }
+
+  const external = await page
+    .locator("a[href^='http']")
+    .evaluateAll((links) => links.map((link) => link.href));
+  for (const href of external) {
+    assert.ok(
+      href.startsWith("https://www.linkedin.com/in/petterf/"),
+      `the page links out to ${href}, which is not on the allowed list`,
+    );
+  }
+
+  const overflow = await page.evaluate(() => ({
+    scroll: document.documentElement.scrollWidth,
+    client: document.documentElement.clientWidth,
+  }));
+  assert.ok(overflow.scroll <= overflow.client + 1, `the page scrolls sideways (${overflow.scroll} > ${overflow.client})`);
+  assert.deepEqual(errors, []);
+  await context.close();
+});
+
+await check("the theme is shared between the two pages", async () => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  await page.goto(`${BASE}/how-this-was-built/`, { waitUntil: "networkidle" });
+  const toggle = page.locator("#theme-toggle");
+  await toggle.click();
+  const chosen = await page.locator("html").getAttribute("data-theme");
+  assert.ok(["light", "dark"].includes(chosen), `the new page set theme "${chosen}"`);
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  assert.equal(await page.locator("html").getAttribute("data-theme"), chosen, "the choice did not carry to the portfolio");
+  await context.close();
+});
+
 
 await browser.close();
 

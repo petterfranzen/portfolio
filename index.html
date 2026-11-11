@@ -195,18 +195,24 @@
               <img
                 class="shot shot-a"
                 src="/apps/flight-1.webp"
+                srcset="/apps/flight-1-720.webp 720w, /apps/flight-1-1024.webp 1024w, /apps/flight-1.webp 1440w"
+                sizes="(min-width: 901px) 52vw, 92vw"
                 width="1440"
                 height="900"
                 alt="Flight Tracker: a dark map of northern Europe with hundreds of aircraft plotted as small cyan triangles."
+                loading="lazy"
                 decoding="async"
               />
               <img
                 class="shot shot-b"
                 src="/apps/flight-2.webp"
+                srcset="/apps/flight-2-720.webp 720w, /apps/flight-2-1024.webp 1024w, /apps/flight-2.webp 1440w"
+                sizes="(min-width: 901px) 52vw, 92vw"
                 width="1440"
                 height="900"
                 alt=""
                 aria-hidden="true"
+                loading="lazy"
                 decoding="async"
               />
               <span class="shot-badge"><span class="live-dot" aria-hidden="true"></span>live</span>
@@ -276,6 +282,22 @@
         </div>
       </section>
     </main>
+
+    <footer class="site-footer">
+      <p class="footer-line">
+        Section 9 <span aria-hidden="true">·</span> a small crew of AI agents, and
+        one human who reads the pull requests.
+      </p>
+      <nav class="footer-nav" aria-label="Elsewhere">
+        <a href="/how-this-was-built/">How this was built</a>
+        <a
+          href="https://www.linkedin.com/in/petterf/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >LinkedIn <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </footer>
 
     <dialog class="palette" id="palette" aria-labelledby="palette-title">
       <form method="dialog" class="palette-form">

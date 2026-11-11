@@ -1,7 +1,8 @@
 # Portfolio — Section 9
 
 Petter Franzén's portfolio: one long page, five acts, each pinned and scrubbed
-by scroll. Professional tone, experimental touches, no framework.
+by scroll, plus a short prose page at `/how-this-was-built/` that explains the
+crew behind it. Professional tone, experimental touches, no framework.
 
 - **01 Boot** — a terminal boot sequence resolves into the name (a decode
   scramble on *Petter Franzén*), then the pitch types in. The grid and glow
@@ -15,6 +16,9 @@ by scroll. Professional tone, experimental touches, no framework.
   you scroll down. Each tile is a night; the one under the centre line offers a
   lazy live preview. The list builds itself at build time.
 - **05 Sign-off** — quiet close: LinkedIn, one line, the theme switch.
+
+A footer closes the page with the link to the prose page, and the command
+palette (`K` or `/`) lists both the acts and that page.
 
 ## How the build-time content works
 
@@ -64,16 +68,20 @@ The scroll work is CSS first:
 
 ```
 index.html                     The five acts, in order
+how-this-was-built/index.html  The prose page about the crew
 src/style.css                  All styling, both themes, scroll-driven plumbing
-src/main.ts                    Boot sequence, rail, palette, theme, fallbacks
+src/main.ts                    Boot sequence, rail, palette, fallbacks
+src/page.ts                    The prose page's entry point
+src/theme.ts                   Theme and view transitions, shared by both pages
 src/flight.ts                  The Flight Tracker canvas backdrop
 src/experiments.ts             Typed access to the generated list
 src/experiments.generated.json Generated at build time; do not edit by hand
 scripts/build-experiments.mjs  Builds that list from ghost-in-the-machine
 content/crew.json              The operating model's agents and lines
 vite.config.ts                 Bakes content into the HTML at build time
-public/apps/                   Two captures of the live Flight Tracker
+public/apps/                   Captures of the live Flight Tracker, three widths
 tests/smoke.spec.mjs           The visitor journey, including the hard rules
+docs/lighthouse.md             The accessibility and Lighthouse pass, with scores
 nginx.conf                     Static file serving; long cache for hashed assets
 Dockerfile                     Build the bundle, serve it from nginx
 deploy/                        NAS deployment (prebuilt image from GHCR)
@@ -100,10 +108,17 @@ another shell `PORTFOLIO_URL=http://localhost:4173 npm run test:lab`.
 
 ## Accessibility and motion
 
+- Lighthouse 13.6.0 against the production build: **Accessibility 100 and Best
+  Practices 100** on both documents, mobile and desktop. Performance is reported
+  honestly in [`docs/lighthouse.md`](docs/lighthouse.md) — the numbers come from
+  a 0.40-CPU sandbox and are not a measurement of the site.
 - Dark and light themes both meet WCAG AA for every text colour; the toggle is
-  in the top bar and in the sign-off.
-- Keyboard focus is always visible; the palette and the rail are usable without
-  a pointer; tap targets are at least 44 px.
+  in the top bar and in the sign-off, and it is shared between the two pages.
+- The wordmark and the "Jump to" label are hidden *visually* on a phone rather
+  than with `display: none`, so both controls keep their accessible names.
+- Keyboard focus is always visible; the skip link, the palette, the rail and
+  the night list are all usable without a pointer; tap targets are at least
+  44 px.
 - `prefers-reduced-motion: reduce` removes pinning, scrubbing, scramble and
   typing, and leaves the five acts as ordinary stacked sections with the same
   content. Previews are never autoplayed.
