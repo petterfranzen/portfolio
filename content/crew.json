@@ -1,27 +1,22 @@
 [
   {
     "name": "Batou",
-    "role": "Engineering",
-    "line": "Builds it. Small commits, tests before the push, no exceptions."
-  },
-  {
-    "name": "Ishikawa",
-    "role": "Research",
-    "line": "Reads the docs and the previous nights so the next attempt isn't a repeat."
-  },
-  {
-    "name": "Saito",
-    "role": "Architecture and review",
-    "line": "Checks the shape of it: boundaries, failure modes, whether it belongs at all."
+    "role": "Coder",
+    "line": "Takes small, well-defined coding tasks: one deliverable per run, built and tested before the push."
   },
   {
     "name": "Togusa",
-    "role": "Quality assurance",
-    "line": "Drives it like a stranger would: on a phone, with the network off."
+    "role": "QA and UI/UX reviewer",
+    "line": "Builds every agent pull request and uses it on desktop and phone, then gives the verdict the merge waits for."
   },
   {
     "name": "Tachikoma",
-    "role": "Nightly experiments",
-    "line": "Ships one small interactive piece a night, in a language it hasn't used yet."
+    "role": "Nightly builder",
+    "line": "Builds one finished small app each night, in a language and an idea that haven't been done before."
+  },
+  {
+    "name": "Ishikawa",
+    "role": "Researcher and read-only ops",
+    "line": "Researches from primary sources, writes the plan for hard tasks, reviews code, and keeps a read-only watch on the stack."
   }
 ]

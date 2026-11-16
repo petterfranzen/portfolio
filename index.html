@@ -7,7 +7,7 @@
     <meta name="color-scheme" content="dark light" />
     <meta
       name="description"
-      content="Petter Franzén — Engineering Manager, Principal Engineer and Solutions Architect in Stockholm. An experimental team of AI agents that design, build and test software around the clock."
+      content="Petter Franzén — Engineering Manager, Principal Engineer and Solutions Architect in Stockholm. A lab of deliberate experiments: a small team of AI agents, a nightly build and a live flight tracker."
     />
     <title>Petter Franzén — Engineering Manager</title>
     <script>
@@ -79,7 +79,7 @@
       <div class="rail-track" aria-hidden="true"><span class="rail-fill"></span></div>
       <ol class="rail-list">
         <li><a href="#act-1" data-act-link="1"><span class="rail-num">01</span><span class="rail-name">Boot</span></a></li>
-        <li><a href="#act-2" data-act-link="2"><span class="rail-num">02</span><span class="rail-name">Operating model</span></a></li>
+        <li><a href="#act-2" data-act-link="2"><span class="rail-num">02</span><span class="rail-name">Section 9</span></a></li>
         <li><a href="#act-3" data-act-link="3"><span class="rail-num">03</span><span class="rail-name">Flight Tracker</span></a></li>
         <li><a href="#act-4" data-act-link="4"><span class="rail-num">04</span><span class="rail-name">Nightly experiments</span></a></li>
         <li><a href="#act-5" data-act-link="5"><span class="rail-num">05</span><span class="rail-name">Sign-off</span></a></li>
@@ -107,66 +107,138 @@
           <p
             class="pitch"
             id="pitch"
-            data-pitch="Engineering leader. I run an experimental team of AI agents that design, build and test software around the clock, and I write up what works."
+            data-pitch="Engineering leader. This is my lab: three deliberate experiments in building software with a small team of AI agents. Each one is testing a question, and this page shows the question and what the data says so far."
           >
-            <span class="pitch-text">Engineering leader. I run an experimental team of AI agents that design, build and test software around the clock, and I write up what works.</span><span class="caret" aria-hidden="true"></span>
+            <span class="pitch-text">Engineering leader. This is my lab: three deliberate experiments in building software with a small team of AI agents. Each one is testing a question, and this page shows the question and what the data says so far.</span><span class="caret" aria-hidden="true"></span>
           </p>
           <p class="scroll-hint" aria-hidden="true"><span>Scroll</span><span class="hint-line"></span></p>
         </div>
       </section>
 
-      <!-- Act 2 — Operating model -->
-      <section class="act act-pin act-model" id="act-2" data-act="2" aria-labelledby="model-title">
-        <div class="pin">
-          <div class="act-head">
-            <p class="act-label"><span>02</span> Operating model</p>
-            <h2 id="model-title">A task enters.<br />Six steps later it ships.</h2>
-            <p class="act-lead">
-              The same loop every night, run by agents that don't get tired and
-              don't skip the tests.
+      <!-- Act 2 — Section 9: the loop, the crew and what is measured -->
+      <section class="act act-s9" id="act-2" data-act="2" aria-labelledby="model-title">
+        <div class="act-model">
+          <div class="pin">
+            <div class="act-head">
+              <p class="act-label"><span>02</span> Experiment <span aria-hidden="true">·</span> Section 9</p>
+              <h2 id="model-title">One person, <!--crew-count--> agents,<br />one loop.</h2>
+              <p class="act-lead">
+                The question: what does it take to run AI agents like a small
+                engineering team, and keep it safe, useful and cheap?
+              </p>
+            </div>
+
+            <ol class="pipeline" id="pipeline" aria-label="How a task moves through Section 9">
+              <li class="stage" data-stage="0">
+                <span class="stage-idx">01</span>
+                <h3>Task</h3>
+                <p class="stage-role">the board</p>
+                <p class="stage-line">An issue with a definition of done, an agent label and a label for who it waits on.</p>
+              </li>
+              <li class="stage" data-stage="1">
+                <span class="stage-idx">02</span>
+                <h3>Pull</h3>
+                <p class="stage-role">the dispatcher</p>
+                <p class="stage-line">One task at a time, and none while review is full. Review is the scarce resource.</p>
+              </li>
+              <li class="stage" data-stage="2">
+                <span class="stage-idx">03</span>
+                <h3>Build</h3>
+                <p class="stage-role">an agent</p>
+                <p class="stage-line">On a branch, in a sandbox that holds no model keys. It opens a pull request and stops.</p>
+              </li>
+              <li class="stage" data-stage="3">
+                <span class="stage-idx">04</span>
+                <h3>QA</h3>
+                <p class="stage-role">a second agent</p>
+                <p class="stage-line">Builds it and uses it on desktop and phone. The verdict never comes from the author.</p>
+              </li>
+              <li class="stage" data-stage="4">
+                <span class="stage-idx">05</span>
+                <h3>Review</h3>
+                <p class="stage-role">the coordinator</p>
+                <p class="stage-line">Green CI, a QA pass and a read of the diff, then the merge. The agents never merge.</p>
+              </li>
+              <li class="stage" data-stage="5">
+                <span class="stage-idx">06</span>
+                <h3>Measure</h3>
+                <p class="stage-role">the ledger</p>
+                <p class="stage-line">Every run is logged: agent, model, duration, outcome and cost.</p>
+              </li>
+            </ol>
+
+            <dl class="stats" id="stats"><!--stats--></dl>
+          </div>
+        </div>
+
+        <div class="annex" id="section9-notes">
+          <div class="annex-block">
+            <h3 class="annex-title" id="crew-title">The crew</h3>
+            <p class="annex-lead">
+              <!--Crew-count--> agents on low-cost models, each with one job, a monthly
+              budget and a time limit per run. A coordinator writes their tasks
+              and reviews their work; I set the rules and read the reports.
             </p>
+            <ul class="crew" aria-labelledby="crew-title">
+            <!--crew-->
+            </ul>
           </div>
 
-          <ol class="pipeline" id="pipeline">
-            <li class="stage" data-stage="0">
-              <span class="stage-idx">01</span>
-              <h3>Intake</h3>
-              <p class="stage-role">the brief</p>
-              <p class="stage-line">A task lands with a definition of done and a deadline.</p>
-            </li>
-            <li class="stage" data-stage="1">
-              <span class="stage-idx">02</span>
-              <h3>Engineering</h3>
-              <p class="stage-role">Batou</p>
-              <p class="stage-line">Builds it. Small commits, tests before the push, no exceptions.</p>
-            </li>
-            <li class="stage" data-stage="2">
-              <span class="stage-idx">03</span>
-              <h3>Research</h3>
-              <p class="stage-role">Ishikawa</p>
-              <p class="stage-line">Reads the docs and the previous nights so the next attempt isn't a repeat.</p>
-            </li>
-            <li class="stage" data-stage="3">
-              <span class="stage-idx">04</span>
-              <h3>Architecture &amp; review</h3>
-              <p class="stage-role">Saito</p>
-              <p class="stage-line">Checks the shape of it: boundaries, failure modes, whether it belongs at all.</p>
-            </li>
-            <li class="stage" data-stage="4">
-              <span class="stage-idx">05</span>
-              <h3>QA</h3>
-              <p class="stage-role">Togusa</p>
-              <p class="stage-line">Drives it like a stranger would: on a phone, with the network off.</p>
-            </li>
-            <li class="stage" data-stage="5">
-              <span class="stage-idx">06</span>
-              <h3>Ship</h3>
-              <p class="stage-role">published</p>
-              <p class="stage-line">Merged, published, logged. Then the next task enters.</p>
-            </li>
-          </ol>
-
-          <dl class="stats" id="stats"><!--stats--></dl>
+          <div class="annex-block">
+            <h3 class="annex-title" id="kpi-title">What gets measured</h3>
+            <p class="annex-lead">
+              A team of agents is managed like any other team: by what it
+              costs, what it finishes and what comes back from review.
+            </p>
+            <ul class="kpis" aria-labelledby="kpi-title">
+              <li class="kpi">
+                <h4>Budget</h4>
+                <p>
+                  A hard monthly cap, a ceiling per agent and a cap on runs per
+                  day. Every run is booked to an owner; spend nobody owns is
+                  treated as a bug.
+                </p>
+              </li>
+              <li class="kpi">
+                <h4>Models</h4>
+                <p>
+                  An agent can be moved to another model from an allow-list,
+                  one run at a time. The ledger records the model asked for and
+                  the model that answered, so trials are compared on cost and
+                  outcome.
+                </p>
+              </li>
+              <li class="kpi">
+                <h4>Timeouts</h4>
+                <p>
+                  A run that hits its time limit delivers nothing, so the rate
+                  is tracked per agent. The coder's was about 40% in the first
+                  week it was measured; the target is under 15%, and the lever
+                  is smaller tasks.
+                </p>
+              </li>
+              <li class="kpi kpi-open">
+                <h4>Code health</h4>
+                <p>
+                  Hypothesis: healthier code makes an agent's next change
+                  cheaper and more reliable. Every repository is being brought
+                  to a CodeScene Code Health of 9.5 or more.
+                  <strong>Being measured; no result yet.</strong>
+                </p>
+              </li>
+            </ul>
+            <p class="annex-foot">
+              The rules and the reasons behind them are public:
+              <a
+                href="https://github.com/petterfranzen/agent-manager/blob/main/docs/DECISIONS.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                >the decision log <span aria-hidden="true">↗</span></a
+              >
+              <span aria-hidden="true">·</span>
+              <a href="/how-this-was-built/">how this site was built</a>
+            </p>
+          </div>
         </div>
       </section>
 
@@ -175,11 +247,13 @@
         <canvas class="arcs" id="arcs" aria-hidden="true"></canvas>
         <div class="flight-inner">
           <div class="flight-copy">
-            <p class="act-label"><span>03</span> Live system</p>
+            <p class="act-label"><span>03</span> Experiment <span aria-hidden="true">·</span> live</p>
             <h2 id="flight-title">Flight Tracker</h2>
             <p class="flight-line">
-              Every aircraft in the world, right now: positions, routes and
-              arrival status, with a position history I actually own.
+              The experiment that got the most thought: live aircraft
+              worldwide, with their position history. The question: how far
+              does a deliberately simple architecture go on a real-time
+              problem?
             </p>
             <a
               class="button"
@@ -219,41 +293,85 @@
             </div>
             <figcaption>flight.pastabake.cloud</figcaption>
           </figure>
+
+          <div class="tests" aria-labelledby="tests-title">
+            <h3 class="tests-title" id="tests-title">What the experiment tests</h3>
+            <ul class="tests-list">
+              <li>
+                <h4>One process</h4>
+                <p>REST, WebSocket and the pollers share one JVM. Live state is a map in memory, not a table.</p>
+              </li>
+              <li>
+                <h4>One file</h4>
+                <p>SQLite with an append-only position history, kept for 72 hours. Distance and airborne hours are derived from it.</p>
+              </li>
+              <li>
+                <h4>One map</h4>
+                <p>A single MapLibre GL map: basemap, airports, trails and planes are all GL layers. No framework.</p>
+              </li>
+              <li>
+                <h4>Deploy on merge</h4>
+                <p>The deploy waits for the health endpoint to report the exact commit it shipped, and rolls back if it never does.</p>
+              </li>
+              <li>
+                <h4>Built with agents</h4>
+                <p>Agents open pull requests here too. None merges without a QA pass, a review and green CI.</p>
+              </li>
+            </ul>
+          </div>
         </div>
       </section>
 
       <!-- Act 4 — Nightly experiments -->
-      <section class="act act-pin act-nights" id="act-4" data-act="4" aria-labelledby="nights-title">
-        <div class="pin pin-nights">
-          <div class="act-head nights-head">
-            <p class="act-label"><span>04</span> Nightly experiments</p>
-            <h2 id="nights-title">One small thing, every night.</h2>
-            <p class="act-lead">
-              A new idea and a new language each night, built and tested while I
-              sleep.
-              <a
-                class="inline-link"
-                href="https://petterfranzen.github.io/ghost-in-the-machine/"
-                target="_blank"
-                rel="noopener noreferrer"
-                >All of them <span aria-hidden="true">↗</span></a
-              >
+      <section class="act act-nightly" id="act-4" data-act="4" aria-labelledby="nights-title">
+        <div class="act-nights">
+          <div class="pin pin-nights">
+            <div class="act-head nights-head">
+              <p class="act-label"><span>04</span> Experiment <span aria-hidden="true">·</span> nightly</p>
+              <h2 id="nights-title">One small app, every night.</h2>
+              <p class="act-lead">
+                Each in a language the builder hasn't used. The question: can
+                an agent finish something every night, and does written
+                feedback change what it builds next?
+                <a
+                  class="inline-link"
+                  href="https://petterfranzen.github.io/ghost-in-the-machine/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >All of them <span aria-hidden="true">↗</span></a
+                >
+              </p>
+            </div>
+
+            <div class="strip-viewport" id="strip-viewport">
+              <div class="strip" id="strip">
+                <ol class="strip-track" id="strip-track"><!--experiments--></ol>
+              </div>
+              <div class="strip-center" aria-hidden="true"></div>
+            </div>
+
+            <p class="strip-hint">
+              <span class="strip-hint-desktop">Scroll to move the strip</span>
+              <span class="strip-hint-phone">Swipe the strip</span>
+              <span aria-hidden="true">·</span>
+              <span id="strip-count">6</span> nights
             </p>
           </div>
+        </div>
 
-          <div class="strip-viewport" id="strip-viewport">
-            <div class="strip" id="strip">
-              <ol class="strip-track" id="strip-track"><!--experiments--></ol>
-            </div>
-            <div class="strip-center" aria-hidden="true"></div>
+        <div class="annex" id="night-notes">
+          <div class="annex-block">
+            <h3 class="annex-title" id="picks-title">Standouts so far</h3>
+            <p class="annex-lead">
+              Every night records its language, its idea and a verdict. These
+              are the most recent ones that were liked; the verdict feeds the
+              next night's brief.
+            </p>
+            <ul class="picks" aria-labelledby="picks-title">
+            <!--standouts-->
+            </ul>
+            <p class="annex-foot" id="night-summary"><!--night-summary--></p>
           </div>
-
-          <p class="strip-hint">
-            <span class="strip-hint-desktop">Scroll to move the strip</span>
-            <span class="strip-hint-phone">Swipe the strip</span>
-            <span aria-hidden="true">·</span>
-            <span id="strip-count">6</span> nights
-          </p>
         </div>
       </section>
 
@@ -261,9 +379,10 @@
       <section class="act act-signoff" id="act-5" data-act="5" aria-labelledby="signoff-title">
         <div class="signoff-inner">
           <p class="act-label"><span>05</span> Sign-off</p>
-          <h2 id="signoff-title">That's the loop.</h2>
+          <h2 id="signoff-title">That's the lab.</h2>
           <p class="signoff-line">
-            If you're building something that needs this kind of engineering
+            Three experiments, each still running. If you want to compare notes
+            on managing agents like a team, or need this kind of engineering
             leadership, I'm on LinkedIn.
           </p>
           <a

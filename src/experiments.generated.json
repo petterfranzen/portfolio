@@ -4,11 +4,103 @@
   "crew": "https://petterfranzen.github.io/ghost-in-the-machine/crew/",
   "experiments": [
     {
+      "date": "2026-11-16",
+      "slug": "2026-11-16-fairy-ring",
+      "title": "Fairy Ring",
+      "language": "ClojureScript",
+      "idea": "A fairy ring of mushrooms in a mossy clearing at dawn, woken with one thumb",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-16-fairy-ring/"
+    },
+    {
+      "date": "2026-11-15",
+      "slug": "2026-11-15-hot-spring",
+      "title": "Hot Spring",
+      "language": "Dart",
+      "idea": "A pixel-art mountain hot spring at night: a monkey soaks while snow falls, and one thumb stirs the water, parts the steam and wakes what hides in the springs.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-15-hot-spring/"
+    },
+    {
+      "date": "2026-11-14",
+      "slug": "2026-11-14-threadloom",
+      "title": "Threadloom",
+      "language": "ReScript",
+      "idea": "A quiet wooden loom you work with one thumb: drag the shuttle across the warp, tap to beat the weft, and a hidden motif appears when the cloth is finished.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-14-threadloom/"
+    },
+    {
+      "date": "2026-11-13",
+      "slug": "2026-11-13-mosslight-pond",
+      "title": "Mosslight Pond",
+      "language": "F# (Fable)",
+      "idea": "A pixel-art pond at night you wake with a thumb: ripples call the koi, mossy stones light lanterns, and something pale surfaces when you go still.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-13-mosslight-pond/"
+    },
+    {
+      "date": "2026-11-12",
+      "slug": "2026-11-12-glowworm-hollow",
+      "title": "Glowworm Hollow",
+      "language": "C",
+      "idea": "A dark cave of glow-worms you wake with a thumb: tap, drag, hold and swipe the rock, and their light reveals what it hides.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-12-glowworm-hollow/"
+    },
+    {
+      "date": "2026-11-11",
+      "slug": "2026-11-11-lantern-alley",
+      "title": "Lantern Alley",
+      "language": "Scala",
+      "idea": "A lantern-lit pixel alley you walk with one thumb, warming lanterns and finding three lost coins.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-11-lantern-alley/"
+    },
+    {
+      "date": "2026-11-10",
+      "slug": "2026-11-10-snow-garden",
+      "title": "Snow Garden",
+      "language": "Rust",
+      "idea": "A quiet snowy garden: a tap sends a small walker trudging through the snow, footprints fill in slowly, and a fox crosses if you stand still.",
+      "verdict": "10 Nov: liked it, and asked for more interaction. Added a drag that draws a groove in the snow, a tap on the tree that shakes snow off and moves the bird to the gate, a long press that rolls a snowball into a snowman (three at most, tap one to topple it), and a swipe across the sky that thickens the fall for a few seconds. Pending re-review.",
+      "standing": "liked",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-10-snow-garden/"
+    },
+    {
+      "date": "2026-11-09",
+      "slug": "2026-11-09-low-tide",
+      "title": "Low Tide",
+      "language": "PureScript",
+      "idea": "A pixel-art low-tide rock shore: every tap blooms a soft wave over a pool and gently wakes what lives in it.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-09-low-tide/"
+    },
+    {
+      "date": "2026-11-08",
+      "slug": "2026-11-08-dune-drift",
+      "title": "Dune Drift",
+      "language": "AssemblyScript",
+      "idea": "A quiet moonlit dune field: tap and a handful of sand drifts down and settles softly into the dunes.",
+      "verdict": "pending review (revision: landscape seeded per visit with ?seed= override, terrain now seed-driven)",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-08-dune-drift/"
+    },
+    {
       "date": "2026-11-05",
       "slug": "2026-11-05-songbranch",
       "title": "Songbranch",
       "language": "Go",
-      "idea": "A pixel-art dusk tree: tap a bird and it hops to the next branch and sings one soft note, and the whole tree settles.",
+      "idea": "A pixel-art dusk tree you nudge: tap a bird and it flutters in place and answers, the scene fills the phone, and small secrets hide in the moon, the nest and the leaves.",
+      "verdict": "revised 7 Nov (gentler birds, full screen mobile, secrets); pending review",
+      "standing": "pending",
       "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-05-songbranch/"
     },
     {
@@ -17,6 +109,8 @@
       "title": "Lantern Moss",
       "language": "Zig",
       "idea": "A calm pixel-art clearing you explore with one thumb: gather three lost lights and wake an old stone.",
+      "verdict": "Liked a lot, together with Koi Drift. Keep the pixel art. Next: combine the two, with taps that feel impactful and still calm.",
+      "standing": "liked",
       "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-01-lantern-moss/"
     },
     {
@@ -25,6 +119,8 @@
       "title": "Koi Drift",
       "language": "Gleam",
       "idea": "A still pond you feed with one thumb: tap and food drifts down, the koi glide over and the ripples spread and fade.",
+      "verdict": "Liked a lot, together with Lantern Moss. Keep the pond and the koi.",
+      "standing": "liked",
       "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-31-koi-drift/"
     },
     {
@@ -33,6 +129,8 @@
       "title": "Fireflies",
       "language": "Elm",
       "idea": "A dusk meadow you fill with fireflies: one tap lifts a small hush of them, and they drift, blink and slowly fade.",
+      "verdict": "Liked a lot, very nice. More like this.",
+      "standing": "liked",
       "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-30-fireflies/"
     },
     {
@@ -41,6 +139,8 @@
       "title": "Zen Rake",
       "language": "Haxe",
       "idea": "A zen sand garden you rake with one thumb; grooves settle behind the rake and slowly fade.",
+      "verdict": "Underwhelming: the raking feels harsh, not relaxing. It needs more satisfying physics (sand that gives, settles and smooths softly).",
+      "standing": "reviewed",
       "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-29-zen-rake/"
     },
     {
@@ -49,6 +149,8 @@
       "title": "Ripple Pool",
       "language": "Nim",
       "idea": "A calm, one-handed tap-to-ripple pond with soft audio.",
+      "verdict": "Great start. Wanted more ripples per stone, moving slower, and each impact dissipating gradually. Petter's idea for a next night: a zen garden raking experience.",
+      "standing": "liked",
       "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-28-ripple-pool/"
     }
   ]

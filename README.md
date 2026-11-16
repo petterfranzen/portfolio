@@ -1,20 +1,24 @@
 # Portfolio — Section 9
 
-Petter Franzén's portfolio: one long page, five acts, each pinned and scrubbed
-by scroll, plus a short prose page at `/how-this-was-built/` that explains the
-crew behind it. Professional tone, experimental touches, no framework.
+Petter Franzén's portfolio: an engineering manager's lab. One long page, five
+acts, three experiments — each with the question it is testing — plus a short
+prose page at `/how-this-was-built/` that explains the crew behind it.
+Professional tone, experimental touches, no framework.
 
 - **01 Boot** — a terminal boot sequence resolves into the name (a decode
   scramble on *Petter Franzén*), then the pitch types in. The grid and glow
   behind it move at different rates to the pointer.
-- **02 Operating model** — a pinned pipeline. A task enters, then Engineering,
-  Research, Architecture and review, QA, ship. Each stage lights in turn as you
-  scroll. The counts beside it are baked in at build time.
-- **03 Flight Tracker** — full bleed: animated flight arcs on a canvas, a
-  cross-fading capture of the real app, one line, and the link out.
+- **02 Section 9** — how one person runs a small team of AI agents. A pinned
+  loop lights stage by stage as you scroll: task, pull, build, QA, review,
+  measure. Under it, unpinned: the crew (from `content/crew.json`) and what
+  gets measured — budget, models, timeouts and the Code Health hypothesis.
+- **03 Flight Tracker** — the experiment that got the most thought. Full
+  bleed: animated flight arcs on a canvas, a cross-fading capture of the real
+  app, the link out, and a panel of the architecture choices it tests.
 - **04 Nightly experiments** — a horizontal filmstrip that scrubs sideways as
-  you scroll down. Each tile is a night; the one under the centre line offers a
-  lazy live preview. The list builds itself at build time.
+  you scroll down. Each tile is a night with its language, idea and verdict;
+  the one under the centre line offers a lazy live preview. Under it: the
+  newest nights that were liked, with the verdict that says so.
 - **05 Sign-off** — quiet close: LinkedIn, one line, the theme switch.
 
 A footer closes the page with the link to the prose page, and the command
@@ -25,25 +29,36 @@ palette (`K` or `/`) lists both the acts and that page.
 Two things must not go stale by hand: the nightly experiments and the numbers
 shown in acts 1–2. Both come from data, not from typing in this repo.
 
-`scripts/build-experiments.mjs` runs as `prebuild`. It makes two public reads of
+`scripts/build-experiments.mjs` runs as `prebuild`. It makes public reads of
 [ghost-in-the-machine](https://github.com/petterfranzen/ghost-in-the-machine):
-the `nights/` directory listing (which nights exist) and `LOG.md` (the idea and
-language for each), and writes `src/experiments.generated.json`. That file is
-committed, so an offline build still ships a list; if the reads fail the script
-keeps the committed copy and warns rather than failing the build. Set
-`GITHUB_TOKEN` to lift the anonymous API rate limit.
+the `nights/` directory listing (which nights exist) and each night's
+`nights/<folder>/night.json` (date, language, idea, verdict). A night without a
+`night.json` falls back to its row in the older `LOG.md` table. Each night also
+gets a `standing` — liked, reviewed or pending — read off its verdict. The
+result is `src/experiments.generated.json`. That file is committed, so an
+offline build still ships a list; if the reads fail the script keeps the
+committed copy and warns rather than failing the build. Set `GITHUB_TOKEN` to
+lift the anonymous API rate limit.
 
-`content/crew.json` holds the five agents and one line each about what they do.
+`content/crew.json` holds the agents and one line each about what they do,
+written from the briefs in
+[agent-manager](https://github.com/petterfranzen/agent-manager) (`agents/`).
 
-`vite.config.ts` runs a small plugin at build time that bakes the experiments,
-the crew count and the derived numbers directly into `index.html` and the
-bundle. The browser never calls GitHub, and the page reads with JavaScript off.
-No numbers in the copy are hand-maintained.
+`vite.config.ts` runs a small plugin at build time that bakes all of it into
+the HTML: the tiles and their verdicts, the standout nights (the newest ones
+whose standing is "liked"), the crew cards, and every count on the page —
+agents, nights, languages, nights with a verdict, and the "four" in the
+Section 9 headline. The browser never calls GitHub, and the page reads with
+JavaScript off. No numbers in the copy are hand-maintained.
+
+The prose in acts 2 and 3 is hand-written, and every claim in it comes from a
+public repository: agent-manager's `docs/DESIGN.md` and `docs/DECISIONS.md`,
+and flight-tracker's `README.md`. Check it against those when they change.
 
 ## Tech
 
 **Vite + vanilla TypeScript**, no UI framework. Production output is roughly
-19 kB HTML, 25 kB CSS and 15 kB JS before gzip (~4.5 / 6.3 / 6.0 kB gzipped).
+42 kB HTML, 34 kB CSS and 18 kB JS before gzip (~8.3 / 7.8 / 7.0 kB gzipped).
 
 The scroll work is CSS first:
 
@@ -51,8 +66,8 @@ The scroll work is CSS first:
   stage lighting, the filmstrip's horizontal travel, and the Flight Tracker
   still cross-fade. Named view timelines are declared on the tall sections so
   the sticky children share one progress clock.
-- Where the browser cannot do that, `src/main.ts` runs a small scroll handler —
-  gated by an IntersectionObserver — for the same states. The two never fight:
+- Where the browser cannot do that, `src/pipeline.ts` and `src/filmstrip.ts`
+  do the same from one shared scroll frame in `src/rail.ts`. The two never fight:
   the fallback only runs when support is missing.
 - The dark/light switch and act jumps go through the View Transitions API where
   it exists and fall back to an instant change.
@@ -70,14 +85,21 @@ The scroll work is CSS first:
 index.html                     The five acts, in order
 how-this-was-built/index.html  The prose page about the crew
 src/style.css                  All styling, both themes, scroll-driven plumbing
-src/main.ts                    Boot sequence, rail, palette, fallbacks
+src/main.ts                    Entry point: starts each module below
+src/dom.ts                     Shared DOM helpers and media queries
+src/atmosphere.ts              Pointer depth for the background layers
+src/boot.ts                    Act 1: the boot sequence
+src/rail.ts                    The rail, scroll progress and act jumps
+src/pipeline.ts                Act 2: the loop's fallback lighting
+src/filmstrip.ts               Act 4: strip fallback, centre tile, previews
+src/palette.ts                 The command palette
 src/page.ts                    The prose page's entry point
 src/theme.ts                   Theme and view transitions, shared by both pages
 src/flight.ts                  The Flight Tracker canvas backdrop
 src/experiments.ts             Typed access to the generated list
 src/experiments.generated.json Generated at build time; do not edit by hand
 scripts/build-experiments.mjs  Builds that list from ghost-in-the-machine
-content/crew.json              The operating model's agents and lines
+content/crew.json              The Section 9 agents and their lines
 vite.config.ts                 Bakes content into the HTML at build time
 public/apps/                   Captures of the live Flight Tracker, three widths
 tests/smoke.spec.mjs           The visitor journey, including the hard rules

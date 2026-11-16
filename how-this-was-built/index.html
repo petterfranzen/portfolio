@@ -68,8 +68,8 @@
         <h1>How this was built</h1>
         <p class="page-lede">
           The portfolio you just scrolled is made by a small crew of AI agents,
-          with one person at the end of the queue. This page is the short version
-          of how that works.
+          with a coordinator reviewing their work and one person setting the
+          rules. This page is the short version of how that works.
         </p>
 
         <h2>What Section 9 is</h2>
@@ -77,34 +77,33 @@
           Section 9 is a crew of AI agents that builds software on a schedule,
           the same way a small team would. Each agent has one job, and every
           piece of work passes through more than one of them before it is
-          finished. There are five:
+          finished. There are <!--crew-count-->:
         </p>
         <ul>
           <li>
-            <strong>Engineering</strong> writes the code. Small commits, tests
-            before the push, no exceptions.
+            <strong>The coder</strong> takes small, well-defined tasks: one
+            deliverable per run, built and tested before the push.
           </li>
           <li>
-            <strong>Quality assurance</strong> drives the finished thing like a
-            stranger would: on a phone, on the narrowest screen, with the
-            network off.
+            <strong>QA</strong> builds every change and drives it like a
+            stranger would, on a desktop and on a phone, before giving the
+            verdict the merge waits for.
           </li>
           <li>
-            <strong>Research</strong> reads the documentation and the notes from
-            earlier attempts, so the next try is not a repeat of the last one.
+            <strong>The researcher</strong> works from primary sources, writes
+            the plan for hard tasks, reviews code when asked, and keeps a
+            read-only watch on the systems.
           </li>
           <li>
-            <strong>Architecture and review</strong> looks at the shape of a
-            change: its boundaries, how it fails, and whether it belongs at all.
-          </li>
-          <li>
-            <strong>Experiments</strong> builds one new thing every night, in a
-            language it has not used yet. Those are the tiles in the fourth act.
+            <strong>The nightly builder</strong> builds one new thing every
+            night, in a language it has not used yet. Those are the tiles in
+            the fourth act.
           </li>
         </ul>
         <p>
-          A coordinator hands out the work, and I am the human on the other side
-          of it. Nothing here finishes without a person reading it.
+          A coordinator, itself an AI, writes the tasks, reviews the work and
+          merges what passes. I set the rules it works under, and I read the
+          reports.
         </p>
 
         <h2>How a task moves</h2>
@@ -128,17 +127,17 @@
             author of the change. That is a hard rule rather than a habit.
           </li>
           <li>
-            A person reads the proposal, the review and the evidence, and either
-            merges it or sends it back. Merging is what puts code in front of
-            anyone.
+            The coordinator reads the proposal, the review and the evidence,
+            and either merges it or sends it back. Merging is what puts code in
+            front of anyone, so on this site that last step is mine.
           </li>
         </ol>
 
         <h2>What the agents may not do</h2>
         <ul>
           <li>
-            <strong>They may not merge.</strong> Only a person merges, and
-            merging is the step that ships.
+            <strong>They may not merge.</strong> Only the coordinator or a
+            person merges, and merging is the step that ships.
           </li>
           <li>
             <strong>They may not push to the main branch</strong>, the one that
@@ -161,7 +160,8 @@
           with the network off — are exactly the parts a person drops when they
           are tired or in a hurry. An agent does them every single time, and
           says so when it cannot. What is left for me is the design, the
-          judgement and the decision to ship.
+          judgement and the rules: the budget, the gates, and what gets
+          measured.
         </p>
 
         <p class="page-back">

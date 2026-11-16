@@ -8,10 +8,16 @@
  * browser never calls GitHub: by the time the site is served, the list is
  * already there.
  *
- * Two public, unauthenticated reads:
+ * Public, unauthenticated reads:
  *   1. repos/<repo>/contents/nights — which night folders actually exist, the
  *      repo being the source of truth for that;
- *   2. LOG.md — the idea and language for each night, the repo's own index.
+ *   2. nights/<folder>/night.json — one file per night (date, language, idea,
+ *      verdict), where the repo has kept its night log since 14 Nov 2026;
+ *   3. LOG.md — the older table, used only for a night with no night.json.
+ *
+ * Each night also gets a `standing` derived from its verdict (liked, reviewed
+ * or pending), so the page can feature the nights that were liked without
+ * anyone picking them by hand.
  *
  * It fails soft on purpose: with no network, or when the API refuses, the
  * previously generated file is kept so the build still ships a site — a stale
@@ -29,6 +35,7 @@ import { fileURLToPath } from "node:url";
 
 const REPO = "petterfranzen/ghost-in-the-machine";
 const BRANCH = "main";
+const RAW_BASE = `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
 const PAGES_BASE = "https://petterfranzen.github.io/ghost-in-the-machine";
 const OUT = path.resolve(
   fileURLToPath(new URL("../src/experiments.generated.json", import.meta.url)),
@@ -65,26 +72,86 @@ async function nightFolders() {
     .map((entry) => entry.name);
 }
 
-/** The LOG.md table, keyed by night folder: date, language and idea. */
+/** One table line as trimmed cells, without the outer pipes. */
+function cellsOf(line) {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cell.trim());
+}
+
+/** The old LOG.md table, keyed by night folder. Empty if it can't be read. */
 async function logRows() {
-  const text = await get(
-    `https://raw.githubusercontent.com/${REPO}/${BRANCH}/LOG.md`,
-    "text",
-  );
   const rows = new Map();
+  let text;
+  try {
+    text = await get(`${RAW_BASE}/LOG.md`, "text");
+  } catch {
+    return rows;
+  }
   for (const line of text.split("\n")) {
-    const cells = line
-      .trim()
-      .replace(/^\|/, "")
-      .replace(/\|$/, "")
-      .split("|")
-      .map((cell) => cell.trim());
-    if (cells.length < 5) continue;
-    const [date, folder, language, idea] = cells;
-    if (!FOLDER_RE.test(folder)) continue;
-    rows.set(folder, { date, language, idea });
+    const [date, folder, language, idea, verdict = ""] = cellsOf(line);
+    if (!idea || !FOLDER_RE.test(folder)) continue;
+    rows.set(folder, { date, language, idea, verdict });
   }
   return rows;
+}
+
+const text = (value) => (typeof value === "string" ? value.trim() : "");
+
+/** A night's own night.json, or null when the folder has none. */
+async function nightFile(slug) {
+  let raw;
+  try {
+    raw = JSON.parse(await get(`${RAW_BASE}/nights/${slug}/night.json`, "text"));
+  } catch (error) {
+    if (String(error?.message).startsWith("404")) return null;
+    throw error;
+  }
+  const row = {
+    date: text(raw.date) || slug.slice(0, 10),
+    language: text(raw.language),
+    idea: text(raw.idea),
+    verdict: text(raw.verdict),
+  };
+  return row.language && row.idea ? row : null;
+}
+
+/** liked, reviewed or pending — read off the verdict, never typed in here. */
+function standingOf(verdict) {
+  if (/\b(liked|loved|great)\b/i.test(verdict)) return "liked";
+  if (!verdict || /\bpending\b/i.test(verdict)) return "pending";
+  return "reviewed";
+}
+
+const byNewest = (a, b) =>
+  a.date === b.date ? a.slug.localeCompare(b.slug) : b.date.localeCompare(a.date);
+
+/** Every night that has a row, from night.json first and LOG.md otherwise. */
+async function readNights() {
+  const [folders, log] = await Promise.all([nightFolders(), logRows()]);
+  const rows = await Promise.all(
+    folders.map(async (slug) => ({ slug, row: (await nightFile(slug)) ?? log.get(slug) })),
+  );
+  const nights = rows
+    .filter(({ row }) => row)
+    .map(({ slug, row }) => ({
+      date: row.date,
+      slug,
+      title: titleFromSlug(slug),
+      language: row.language,
+      idea: row.idea,
+      verdict: row.verdict,
+      standing: standingOf(row.verdict),
+      url: `${PAGES_BASE}/${slug}/`,
+    }))
+    .sort(byNewest);
+  if (nights.length === 0) {
+    throw new Error("no night folders with a night.json or a LOG.md entry were found");
+  }
+  return nights;
 }
 
 /** "2026-10-31-koi-drift" -> "Koi Drift". */
@@ -102,49 +169,50 @@ function titleFromSlug(slug) {
 /** --check: verify the committed list instead of writing it. */
 const CHECK = process.argv.includes("--check");
 
-async function main() {
-  let nights;
+const warn = (message) => console.warn(`build-experiments: ${message}`);
+const fail = (message) => {
+  console.error(`build-experiments: ${message}`);
+  process.exitCode = 1;
+};
+
+/**
+ * The nights to publish, or null when there is nothing new to write: the
+ * check cannot vouch for a list it could not rebuild, and a build keeps the
+ * committed copy rather than ship an empty one.
+ */
+async function nightsOrFallback() {
   try {
-    const [folders, log] = await Promise.all([nightFolders(), logRows()]);
-    nights = folders
-      .filter((slug) => log.has(slug))
-      .map((slug) => {
-        const row = log.get(slug);
-        return {
-          date: row.date,
-          slug,
-          title: titleFromSlug(slug),
-          language: row.language,
-          idea: row.idea,
-          url: `${PAGES_BASE}/${slug}/`,
-        };
-      })
-      .sort((a, b) =>
-        a.date === b.date
-          ? a.slug.localeCompare(b.slug)
-          : b.date.localeCompare(a.date),
-      );
-    if (nights.length === 0) {
-      throw new Error("no night folders with a LOG.md entry were found");
-    }
+    return await readNights();
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
     if (CHECK) {
-      // A list we cannot rebuild is a list we cannot vouch for.
-      console.error(`build-experiments: cannot reach ghost-in-the-machine: ${reason}`);
-      console.error("build-experiments: cannot verify the committed list");
-      process.exitCode = 1;
-      return;
+      fail(`cannot reach ghost-in-the-machine: ${reason}`);
+      fail("cannot verify the committed list");
+      return null;
     }
+    warn(reason);
     if (existsSync(OUT)) {
-      console.warn(`build-experiments: ${reason}`);
-      console.warn("build-experiments: keeping the committed list");
-      return;
+      warn("keeping the committed list");
+      return null;
     }
-    console.warn(`build-experiments: ${reason}`);
-    console.warn("build-experiments: writing an empty list");
-    nights = [];
+    warn("writing an empty list");
+    return [];
   }
+}
+
+async function check(rendered, count) {
+  const committed = existsSync(OUT) ? await readFile(OUT, "utf8") : "";
+  if (committed === rendered) {
+    console.log(`build-experiments: list is up to date (${count} night(s))`);
+    return;
+  }
+  fail(`the committed list is out of date — ghost-in-the-machine now has ${count} night(s)`);
+  fail("run `npm run experiments` and commit src/experiments.generated.json");
+}
+
+async function main() {
+  const nights = await nightsOrFallback();
+  if (!nights) return;
 
   const payload = {
     generated: "scripts/build-experiments.mjs",
@@ -155,21 +223,9 @@ async function main() {
   const rendered = `${JSON.stringify(payload, null, 2)}\n`;
 
   if (CHECK) {
-    const committed = existsSync(OUT) ? await readFile(OUT, "utf8") : "";
-    if (committed !== rendered) {
-      console.error(
-        `build-experiments: the committed list is out of date — ghost-in-the-machine now has ${nights.length} night(s)`,
-      );
-      console.error(
-        "build-experiments: run `npm run experiments` and commit src/experiments.generated.json",
-      );
-      process.exitCode = 1;
-      return;
-    }
-    console.log(`build-experiments: list is up to date (${nights.length} night(s))`);
+    await check(rendered, nights.length);
     return;
   }
-
   await writeFile(OUT, rendered);
   console.log(
     `build-experiments: ${nights.length} night(s) -> ${path.relative(process.cwd(), OUT)}`,

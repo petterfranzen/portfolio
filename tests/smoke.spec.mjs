@@ -159,6 +159,12 @@ await check("the page reads with JavaScript off", async () => {
   assert.match(text, /Engineering leader/);
   assert.match(text, /Flight Tracker/);
   assert.match(text, /Lantern Moss/);
+  // The new sections are HTML too: the loop, the crew, the panel, the standouts.
+  for (const heading of [/The crew/, /What gets measured/, /What the experiment tests/, /Standouts so far/]) {
+    assert.match(text, heading);
+  }
+  assert.ok(await page.locator(".crew-card").count() > 0, "no crew without JavaScript");
+  assert.ok(await page.locator(".pick").count() > 0, "no standouts without JavaScript");
   assert.match(text, /linkedin\.com\/in\/petterf/);
   const hrefs = await page.locator("a[href^='http']").evaluateAll((links) => links.map((link) => link.href));
   assert.ok(hrefs.some((href) => href.startsWith("https://flight.pastabake.cloud")));
@@ -322,6 +328,91 @@ await check("keyboard only: the nightly list is reachable and named", async () =
   await context.close();
 });
 
+await check("Section 9 has its loop, a crew baked from the roster and what is measured", async () => {
+  const { context, page } = await open();
+  const act = page.locator("#act-2");
+  assert.equal(await act.locator(".stage").count(), 6, "the loop should have six stages");
+  const crew = await act.locator(".crew-card h4").allInnerTexts();
+  assert.ok(crew.length >= 3, `only ${crew.length} crew cards were baked in`);
+  const stat = await page.locator("#stats .stat dd").first().innerText();
+  assert.equal(Number(stat), crew.length, "the agent count and the crew cards disagree");
+  for (const line of await act.locator(".crew-line").allInnerTexts()) {
+    assert.ok(line.trim().length > 20, "a crew card has no line");
+  }
+  const text = await page.locator("body").innerText();
+  assert.ok(!/\b(Saito|Aramaki)\b/.test(text), "an agent who has left the team is still on the page");
+  assert.ok(!/<!--[A-Za-z-]+-->/.test(await page.content()), "a build-time placeholder was left in the HTML");
+  const kpis = (await act.locator(".kpi h4").allInnerTexts()).map((kpi) => kpi.trim());
+  assert.deepEqual(kpis, ["Budget", "Models", "Timeouts", "Code health"]);
+  // The code-health claim is a hypothesis until there is data: it must say so.
+  assert.match(await act.locator(".kpi-open").innerText(), /being measured/i);
+  await context.close();
+});
+
+await check("the Flight Tracker act says what the experiment tests", async () => {
+  const { context, page } = await open();
+  const panel = page.locator("#act-3 .tests");
+  assert.match(await panel.locator("h3").innerText(), /What the experiment tests/);
+  assert.equal(await panel.locator(".tests-list li").count(), 5);
+  const text = await panel.innerText();
+  for (const fact of [/one JVM/, /SQLite/, /MapLibre GL/, /health endpoint/, /QA pass/]) {
+    assert.match(text, fact);
+  }
+  await context.close();
+});
+
+const TILE_FIELDS = {
+  title: ".tile-title",
+  language: ".tile-lang",
+  idea: ".tile-idea",
+  verdict: ".verdict-text",
+  badge: ".verdict-badge",
+};
+
+/** Every tile in the strip as plain data: its text fields and its standing. */
+function readNights(page) {
+  return page.locator(".tile").evaluateAll((tiles, fields) => {
+    const read = (tile, selector) => (tile.querySelector(selector)?.textContent ?? "").trim();
+    return tiles.map((tile) => ({
+      ...Object.fromEntries(Object.entries(fields).map(([key, selector]) => [key, read(tile, selector)])),
+      standing: tile.querySelector(fields.badge).dataset.standing,
+    }));
+  }, TILE_FIELDS);
+}
+
+await check("every night shows its language, idea and verdict", async () => {
+  const { context, page } = await open();
+  const nights = await readNights(page);
+  assert.equal(nights.length, Number(await page.locator("#strip-count").innerText()));
+  for (const night of nights) {
+    assert.ok(night.language, `${night.title} has no language`);
+    assert.ok(night.idea, `${night.title} has no idea`);
+    assert.match(night.standing, /^(liked|reviewed|pending)$/, `${night.title} has no verdict badge`);
+    // A night that has been reviewed shows the words, not just the badge.
+    assert.equal(night.verdict.length > 0, night.standing !== "pending", `${night.title}: verdict text and badge disagree`);
+  }
+  await context.close();
+});
+
+await check("the standouts are the newest liked nights, with their verdicts", async () => {
+  const { context, page } = await open();
+  const nights = await readNights(page);
+  const liked = nights.filter((night) => night.standing === "liked").map((night) => night.title);
+  const picks = await page.locator(".pick h4").allInnerTexts();
+  assert.equal(picks.length, Math.min(4, liked.length), "four standouts at most, all of them liked");
+  picks.forEach((pick, index) =>
+    assert.ok(pick.includes(liked[index]), `standout ${index + 1} is "${pick}", expected ${liked[index]}`),
+  );
+  for (const verdict of await page.locator(".pick-verdict").allInnerTexts()) {
+    assert.ok(verdict.replace(/^verdict/i, "").trim().length > 10, "a standout has no verdict");
+  }
+  assert.match(
+    await page.locator("#night-summary").innerText(),
+    new RegExp(`^${nights.length} nights? · \\d+ languages? · ${liked.length} liked`),
+  );
+  await context.close();
+});
+
 await check("the footer links to a working How this was built page", async () => {
   const { context, page } = await open();
   const link = page.locator("footer a[href='/how-this-was-built/']");
@@ -398,6 +489,9 @@ await check("the theme is shared between the two pages", async () => {
   await page.goto(`${BASE}/how-this-was-built/`, { waitUntil: "networkidle" });
   const toggle = page.locator("#theme-toggle");
   await toggle.click();
+  // The swap runs inside a view transition, so it lands a frame or two after
+  // the click: wait for the choice to be saved before reading it.
+  await page.waitForFunction(() => localStorage.getItem("theme") === document.documentElement.dataset.theme);
   const chosen = await page.locator("html").getAttribute("data-theme");
   assert.ok(["light", "dark"].includes(chosen), `the new page set theme "${chosen}"`);
   await page.goto(BASE, { waitUntil: "networkidle" });
