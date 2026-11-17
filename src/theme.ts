@@ -5,7 +5,7 @@
  * Shared by the five-act page (src/main.ts) and the plain prose page
  * (src/page.ts) so that both read the same saved choice and write it back the
  * same way. The saved value wins; otherwise the OS preference decides — the
- * inline script in each page's head applies it before first paint.
+ * same-origin /boot.js in each page's head applies it before first paint.
  */
 
 const root = document.documentElement;

@@ -10,21 +10,7 @@
       content="Petter Franzén — Engineering Manager, Principal Engineer and Solutions Architect in Stockholm. A lab of deliberate experiments: a small team of AI agents, a nightly build and a live flight tracker."
     />
     <title>Petter Franzén — Engineering Manager</title>
-    <script>
-      // Before first paint: mark that JS is running (so the boot sequence can
-      // start hidden) and apply the saved theme. Without JS neither happens and
-      // the page is simply a readable, stacked document.
-      (function () {
-        var root = document.documentElement;
-        root.classList.add("js");
-        try {
-          var saved = localStorage.getItem("theme");
-          if (saved === "light" || saved === "dark") root.dataset.theme = saved;
-          else if (matchMedia("(prefers-color-scheme: light)").matches)
-            root.dataset.theme = "light";
-        } catch (e) {}
-      })();
-    </script>
+    <script src="/boot.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#act-1">Skip to content</a>

@@ -5,8 +5,11 @@
  * Static (always): nginx.conf and security-headers.conf must declare the
  * headers; the snippet must be included in the server block and in every
  * location block that sets its own add_header (nginx stops inheriting the
- * moment a block declares one); HSTS must not be set here; and the pinned
- * sha256 in the CSP must still match the inline boot script in index.html.
+ * moment a block declares one); HSTS must not be set here; and every script
+ * in every page must be allowed by script-src: each inline one by its sha256,
+ * each external one by being same-origin. The pages are the source HTML and,
+ * once `npm run build` has run, every HTML file in dist/ (CI runs it after the
+ * build, so what ships is what is checked).
  *
  * Live (optional): set TARGET_URL to fetch a running site and assert the
  * headers actually arrive.
@@ -14,9 +17,9 @@
  *   npm run test:headers
  *   TARGET_URL=https://www.pastabake.cloud npm run test:headers
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
@@ -72,7 +75,29 @@ function inlineScripts(html) {
 
 const nginx = readFileSync(join(root, "nginx.conf"), "utf8");
 const headersConf = readFileSync(join(root, "security-headers.conf"), "utf8");
-const html = readFileSync(join(root, "index.html"), "utf8");
+
+/** Every .html file under dir, as paths. */
+function htmlFiles(dir) {
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir, { recursive: true })
+    .map(String)
+    .filter((file) => file.endsWith(".html"))
+    .map((file) => join(dir, file));
+}
+
+/** The source pages plus whatever the last build wrote to dist/. */
+const pages = [
+  join(root, "index.html"),
+  join(root, "how-this-was-built", "index.html"),
+  ...htmlFiles(join(root, "dist")),
+].map((file) => ({ name: relative(root, file), html: readFileSync(file, "utf8") }));
+
+/** The src of every external script. */
+function externalScripts(html) {
+  return [...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)].map((m) => m[1]);
+}
+
+const sha256 = (text) => `'sha256-${createHash("sha256").update(text, "utf8").digest("base64")}'`;
 
 const declared = new Set(
   [...headersConf.matchAll(/^add_header\s+([A-Za-z0-9-]+)\s/gm)].map((m) => m[1]),
@@ -107,18 +132,25 @@ await check("every block that sets a header re-includes the snippet", () => {
   }
 });
 
-await check("the CSP pins the inline boot script", () => {
-  const csp = headersConf.match(/Content-Security-Policy\s+"([^"]+)"/)?.[1];
-  assert.ok(csp, "no CSP found");
-  const scriptSrc = csp.match(/script-src([^;]*)/)?.[1] ?? "";
+const scriptSrc = headersConf.match(/Content-Security-Policy\s+"([^"]+)"/)?.[1].match(/script-src([^;]*)/)?.[1] ?? "";
+
+await check("script-src allows no inline script by default", () => {
+  assert.ok(scriptSrc, "no CSP with a script-src found");
   assert.ok(!scriptSrc.includes("'unsafe-inline'"), "script-src must not allow 'unsafe-inline'");
-  const inline = inlineScripts(html);
-  assert.equal(inline.length, 1, `expected exactly one inline script, found ${inline.length}`);
-  const hash = `'sha256-${createHash("sha256").update(inline[0], "utf8").digest("base64")}'`;
-  assert.ok(
-    scriptSrc.includes(hash),
-    `script-src is missing ${hash} - the inline boot script changed, update security-headers.conf`,
-  );
+  assert.match(scriptSrc, /'self'/, "script-src must allow 'self' for the bundles and /boot.js");
+});
+
+await check(`every script in ${pages.length} page(s) is allowed by script-src`, () => {
+  assert.ok(pages.length >= 2, "expected at least index.html and how-this-was-built/index.html");
+  for (const page of pages) {
+    for (const script of inlineScripts(page.html)) {
+      const hash = sha256(script);
+      assert.ok(scriptSrc.includes(hash), `${page.name}: an inline script (${hash}) is blocked by script-src`);
+    }
+    for (const src of externalScripts(page.html)) {
+      assert.ok(src.startsWith("/") && !src.startsWith("//"), `${page.name}: ${src} is not same-origin`);
+    }
+  }
 });
 
 const target = process.env.TARGET_URL;
@@ -136,7 +168,7 @@ if (target) {
   await check("no inline script is blocked by the served CSP", async () => {
     const csp = served("Content-Security-Policy");
     for (const script of inlineScripts(await response.clone().text())) {
-      const hash = `'sha256-${createHash("sha256").update(script, "utf8").digest("base64")}'`;
+      const hash = sha256(script);
       assert.ok(csp.includes(hash), `the served CSP does not allow ${hash}`);
     }
   });

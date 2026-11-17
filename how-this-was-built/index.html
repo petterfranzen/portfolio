@@ -11,21 +11,7 @@
       content="How Section 9 works: a small crew of AI agents that build, research, test and review software, with a human who reads the pull requests and merges."
     />
     <title>How this was built — Section 9</title>
-    <script>
-      // Before first paint: mark that JS is running and apply the saved theme.
-      // Without JS the saved choice is simply not read and the page is a
-      // readable, stacked document in the default theme.
-      (function () {
-        var root = document.documentElement;
-        root.classList.add("js");
-        try {
-          var saved = localStorage.getItem("theme");
-          if (saved === "light" || saved === "dark") root.dataset.theme = saved;
-          else if (matchMedia("(prefers-color-scheme: light)").matches)
-            root.dataset.theme = "light";
-        } catch (e) {}
-      })();
-    </script>
+    <script src="/boot.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
