@@ -16,8 +16,9 @@ Professional tone, experimental touches, no framework.
   bleed: animated flight arcs on a canvas, a cross-fading capture of the real
   app, the link out, and a panel of the architecture choices it tests.
 - **04 Nightly experiments** — a horizontal filmstrip that scrubs sideways as
-  you scroll down. Each tile is a night with its language, idea and verdict;
-  the one under the centre line offers a lazy live preview. Under it: the
+  you scroll down. Each tile is a night with a screenshot, its language, idea
+  and verdict, and a link to the app on GitHub Pages; the one under the centre
+  line offers a lazy live preview over its screenshot. Under it: the
   newest nights that were liked, with the verdict that says so.
 - **05 Sign-off** — quiet close: LinkedIn, one line, the theme switch.
 
@@ -34,8 +35,10 @@ shown in acts 1–2. Both come from data, not from typing in this repo.
 the `nights/` directory listing (which nights exist) and each night's
 `nights/<folder>/night.json` (date, language, idea, verdict). A night without a
 `night.json` falls back to its row in the older `LOG.md` table. Each night also
-gets a `standing` — liked, reviewed or pending — read off its verdict. The
-result is `src/experiments.generated.json`. That file is committed, so an
+gets a `standing` — liked, reviewed or pending — read off its verdict — and a
+`thumbnail` when a screenshot is committed at `public/nights/<folder>.webp`
+(640×400 WebP, served from this site; a night without one gets a text tile).
+The result is `src/experiments.generated.json`. That file is committed, so an
 offline build still ships a list; if the reads fail the script keeps the
 committed copy and warns rather than failing the build. Set `GITHUB_TOKEN` to
 lift the anonymous API rate limit.

@@ -13,6 +13,8 @@ interface Night {
   verdict: string;
   standing: Standing;
   url: string;
+  /** Root-relative path of a committed screenshot, when there is one. */
+  thumbnail?: string;
 }
 
 interface Crew {
@@ -107,16 +109,30 @@ const crewCards = (crew: Crew[]) =>
 const verdictText = (night: Night) =>
   night.standing === "pending" ? "" : `<span class="verdict-text">${escape(brief(night.verdict))}</span>`;
 
+/** Thumbnails are 640×400 WebP; the attributes reserve their box before they load. */
+const THUMB_WIDTH = 640;
+const THUMB_HEIGHT = 400;
+
+/**
+ * A night's screenshot, or — for a night nobody has captured yet — a plain
+ * panel the same size, so every tile keeps the same shape.
+ */
+const tileShot = (night: Night) =>
+  night.thumbnail
+    ? `<img class="tile-shot" src="${escape(night.thumbnail)}" width="${THUMB_WIDTH}" height="${THUMB_HEIGHT}" loading="lazy" decoding="async" alt="${escape(night.idea)} — screenshot" />`
+    : `<span class="tile-shot tile-shot-none" aria-hidden="true">${escape(night.language)}</span>`;
+
 const tiles = (nights: Night[]) =>
   nights
     .map(
       (night, index) => `<li class="tile" data-index="${index}" data-url="${escape(night.url)}">
               <a class="tile-link" href="${escape(night.url)}" target="_blank" rel="noopener noreferrer">
+                ${tileShot(night)}
                 <span class="tile-top"><span class="tile-date">${escape(night.date)}</span><span class="tile-lang">${escape(night.language)}</span></span>
                 <span class="tile-title">${escape(night.title)}</span>
                 <span class="tile-idea">${escape(night.idea)}</span>
                 ${verdictText(night)}
-                <span class="tile-foot"><span class="tile-open">Open <span aria-hidden="true">↗</span><span class="sr-only"> ${escape(night.title)}</span></span><span class="verdict-badge" data-standing="${night.standing}"><span class="sr-only">Verdict: </span>${STANDING_LABEL[night.standing]}</span></span>
+                <span class="tile-foot"><span class="tile-open">Open the app <span aria-hidden="true">↗</span><span class="sr-only"> ${escape(night.title)} (new tab)</span></span><span class="verdict-badge" data-standing="${night.standing}"><span class="sr-only">Verdict: </span>${STANDING_LABEL[night.standing]}</span></span>
               </a>
               <div class="tile-preview" data-preview>
                 <button class="tile-play" type="button" aria-label="Play a live preview of ${escape(night.title)}">Play preview</button>

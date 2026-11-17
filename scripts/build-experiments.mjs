@@ -17,7 +17,10 @@
  *
  * Each night also gets a `standing` derived from its verdict (liked, reviewed
  * or pending), so the page can feature the nights that were liked without
- * anyone picking them by hand.
+ * anyone picking them by hand, and a `thumbnail` when this repo has a
+ * screenshot of it committed at public/nights/<folder>.webp. A night without
+ * one still gets a tile, just a text one, so a new night never waits on a
+ * screenshot.
  *
  * It fails soft on purpose: with no network, or when the API refuses, the
  * previously generated file is kept so the build still ships a site — a stale
@@ -40,6 +43,8 @@ const PAGES_BASE = "https://petterfranzen.github.io/ghost-in-the-machine";
 const OUT = path.resolve(
   fileURLToPath(new URL("../src/experiments.generated.json", import.meta.url)),
 );
+const PUBLIC_DIR = path.resolve(fileURLToPath(new URL("../public", import.meta.url)));
+const THUMBNAIL_DIR = "nights";
 const TIMEOUT_MS = 10_000;
 const FOLDER_RE = /^\d{4}-\d{2}-\d{2}-[a-z0-9-]+$/;
 const SMALL_WORDS = new Set(["and", "of", "the", "in", "on", "a", "to"]);
@@ -119,6 +124,12 @@ async function nightFile(slug) {
   return row.language && row.idea ? row : null;
 }
 
+/** `{ thumbnail }` when a screenshot of the night is committed, else nothing. */
+function thumbnailOf(slug) {
+  const file = `${THUMBNAIL_DIR}/${slug}.webp`;
+  return existsSync(path.join(PUBLIC_DIR, file)) ? { thumbnail: `/${file}` } : {};
+}
+
 /** liked, reviewed or pending — read off the verdict, never typed in here. */
 function standingOf(verdict) {
   if (/\b(liked|loved|great)\b/i.test(verdict)) return "liked";
@@ -146,6 +157,7 @@ async function readNights() {
       verdict: row.verdict,
       standing: standingOf(row.verdict),
       url: `${PAGES_BASE}/${slug}/`,
+      ...thumbnailOf(slug),
     }))
     .sort(byNewest);
   if (nights.length === 0) {

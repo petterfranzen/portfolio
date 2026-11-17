@@ -11,7 +11,8 @@
       "idea": "A fairy ring of mushrooms in a mossy clearing at dawn, woken with one thumb",
       "verdict": "pending review",
       "standing": "pending",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-16-fairy-ring/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-16-fairy-ring/",
+      "thumbnail": "/nights/2026-11-16-fairy-ring.webp"
     },
     {
       "date": "2026-11-15",
@@ -21,7 +22,8 @@
       "idea": "A pixel-art mountain hot spring at night: a monkey soaks while snow falls, and one thumb stirs the water, parts the steam and wakes what hides in the springs.",
       "verdict": "pending review",
       "standing": "pending",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-15-hot-spring/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-15-hot-spring/",
+      "thumbnail": "/nights/2026-11-15-hot-spring.webp"
     },
     {
       "date": "2026-11-14",
@@ -31,7 +33,8 @@
       "idea": "A quiet wooden loom you work with one thumb: drag the shuttle across the warp, tap to beat the weft, and a hidden motif appears when the cloth is finished.",
       "verdict": "pending review",
       "standing": "pending",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-14-threadloom/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-14-threadloom/",
+      "thumbnail": "/nights/2026-11-14-threadloom.webp"
     },
     {
       "date": "2026-11-13",
@@ -41,7 +44,8 @@
       "idea": "A pixel-art pond at night you wake with a thumb: ripples call the koi, mossy stones light lanterns, and something pale surfaces when you go still.",
       "verdict": "pending review",
       "standing": "pending",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-13-mosslight-pond/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-13-mosslight-pond/",
+      "thumbnail": "/nights/2026-11-13-mosslight-pond.webp"
     },
     {
       "date": "2026-11-12",
@@ -51,7 +55,8 @@
       "idea": "A dark cave of glow-worms you wake with a thumb: tap, drag, hold and swipe the rock, and their light reveals what it hides.",
       "verdict": "pending review",
       "standing": "pending",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-12-glowworm-hollow/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-12-glowworm-hollow/",
+      "thumbnail": "/nights/2026-11-12-glowworm-hollow.webp"
     },
     {
       "date": "2026-11-11",
@@ -61,7 +66,8 @@
       "idea": "A lantern-lit pixel alley you walk with one thumb, warming lanterns and finding three lost coins.",
       "verdict": "pending review",
       "standing": "pending",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-11-lantern-alley/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-11-lantern-alley/",
+      "thumbnail": "/nights/2026-11-11-lantern-alley.webp"
     },
     {
       "date": "2026-11-10",
@@ -71,7 +77,8 @@
       "idea": "A quiet snowy garden: a tap sends a small walker trudging through the snow, footprints fill in slowly, and a fox crosses if you stand still.",
       "verdict": "10 Nov: liked it, and asked for more interaction. Added a drag that draws a groove in the snow, a tap on the tree that shakes snow off and moves the bird to the gate, a long press that rolls a snowball into a snowman (three at most, tap one to topple it), and a swipe across the sky that thickens the fall for a few seconds. Pending re-review.",
       "standing": "liked",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-10-snow-garden/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-10-snow-garden/",
+      "thumbnail": "/nights/2026-11-10-snow-garden.webp"
     },
     {
       "date": "2026-11-09",
@@ -81,7 +88,8 @@
       "idea": "A pixel-art low-tide rock shore: every tap blooms a soft wave over a pool and gently wakes what lives in it.",
       "verdict": "pending review",
       "standing": "pending",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-09-low-tide/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-09-low-tide/",
+      "thumbnail": "/nights/2026-11-09-low-tide.webp"
     },
     {
       "date": "2026-11-08",
@@ -91,7 +99,8 @@
       "idea": "A quiet moonlit dune field: tap and a handful of sand drifts down and settles softly into the dunes.",
       "verdict": "pending review (revision: landscape seeded per visit with ?seed= override, terrain now seed-driven)",
       "standing": "pending",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-08-dune-drift/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-08-dune-drift/",
+      "thumbnail": "/nights/2026-11-08-dune-drift.webp"
     },
     {
       "date": "2026-11-05",
@@ -101,7 +110,8 @@
       "idea": "A pixel-art dusk tree you nudge: tap a bird and it flutters in place and answers, the scene fills the phone, and small secrets hide in the moon, the nest and the leaves.",
       "verdict": "revised 7 Nov (gentler birds, full screen mobile, secrets); pending review",
       "standing": "pending",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-05-songbranch/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-05-songbranch/",
+      "thumbnail": "/nights/2026-11-05-songbranch.webp"
     },
     {
       "date": "2026-11-01",
@@ -111,7 +121,8 @@
       "idea": "A calm pixel-art clearing you explore with one thumb: gather three lost lights and wake an old stone.",
       "verdict": "Liked a lot, together with Koi Drift. Keep the pixel art. Next: combine the two, with taps that feel impactful and still calm.",
       "standing": "liked",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-01-lantern-moss/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-01-lantern-moss/",
+      "thumbnail": "/nights/2026-11-01-lantern-moss.webp"
     },
     {
       "date": "2026-10-31",
@@ -121,7 +132,8 @@
       "idea": "A still pond you feed with one thumb: tap and food drifts down, the koi glide over and the ripples spread and fade.",
       "verdict": "Liked a lot, together with Lantern Moss. Keep the pond and the koi.",
       "standing": "liked",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-31-koi-drift/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-31-koi-drift/",
+      "thumbnail": "/nights/2026-10-31-koi-drift.webp"
     },
     {
       "date": "2026-10-30",
@@ -131,7 +143,8 @@
       "idea": "A dusk meadow you fill with fireflies: one tap lifts a small hush of them, and they drift, blink and slowly fade.",
       "verdict": "Liked a lot, very nice. More like this.",
       "standing": "liked",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-30-fireflies/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-30-fireflies/",
+      "thumbnail": "/nights/2026-10-30-fireflies.webp"
     },
     {
       "date": "2026-10-29",
@@ -141,7 +154,8 @@
       "idea": "A zen sand garden you rake with one thumb; grooves settle behind the rake and slowly fade.",
       "verdict": "Underwhelming: the raking feels harsh, not relaxing. It needs more satisfying physics (sand that gives, settles and smooths softly).",
       "standing": "reviewed",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-29-zen-rake/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-29-zen-rake/",
+      "thumbnail": "/nights/2026-10-29-zen-rake.webp"
     },
     {
       "date": "2026-10-28",
@@ -151,7 +165,8 @@
       "idea": "A calm, one-handed tap-to-ripple pond with soft audio.",
       "verdict": "Great start. Wanted more ripples per stone, moving slower, and each impact dissipating gradually. Petter's idea for a next night: a zen garden raking experience.",
       "standing": "liked",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-28-ripple-pool/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-10-28-ripple-pool/",
+      "thumbnail": "/nights/2026-10-28-ripple-pool.webp"
     }
   ]
 }

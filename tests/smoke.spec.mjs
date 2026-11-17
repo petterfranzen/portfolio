@@ -165,6 +165,7 @@ await check("the page reads with JavaScript off", async () => {
   }
   assert.ok(await page.locator(".crew-card").count() > 0, "no crew without JavaScript");
   assert.ok(await page.locator(".pick").count() > 0, "no standouts without JavaScript");
+  assert.ok(await page.locator(".tile img.tile-shot").count() > 0, "no night screenshots without JavaScript");
   assert.match(text, /linkedin\.com\/in\/petterf/);
   const hrefs = await page.locator("a[href^='http']").evaluateAll((links) => links.map((link) => link.href));
   assert.ok(hrefs.some((href) => href.startsWith("https://flight.pastabake.cloud")));
@@ -410,6 +411,56 @@ await check("the standouts are the newest liked nights, with their verdicts", as
     await page.locator("#night-summary").innerText(),
     new RegExp(`^${nights.length} nights? · \\d+ languages? · ${liked.length} liked`),
   );
+  await context.close();
+});
+
+const PAGES_NIGHT = /^https:\/\/petterfranzen\.github\.io\/ghost-in-the-machine\/\d{4}-\d{2}-\d{2}-[a-z0-9-]+\/$/;
+
+/** Each tile's app link and, when it has one, its screenshot. */
+function readTileLinks(page) {
+  return page.locator(".tile").evaluateAll((tiles) =>
+    tiles.map((tile) => {
+      const link = tile.querySelector("a.tile-link");
+      const shot = tile.querySelector("img.tile-shot");
+      return {
+        title: tile.querySelector(".tile-title")?.textContent?.trim() ?? "",
+        href: link?.href ?? "",
+        target: link?.target ?? "",
+        rel: link?.rel ?? "",
+        open: tile.querySelector(".tile-open")?.textContent ?? "",
+        shot: shot && {
+          src: shot.getAttribute("src") ?? "",
+          alt: shot.getAttribute("alt") ?? "",
+          width: Number(shot.getAttribute("width")),
+          height: Number(shot.getAttribute("height")),
+          loading: shot.getAttribute("loading"),
+        },
+      };
+    }),
+  );
+}
+
+await check("every night links to its app on GitHub Pages, with its screenshot", async () => {
+  const { context, page } = await open();
+  const tiles = await readTileLinks(page);
+  assert.equal(tiles.length, Number(await page.locator("#strip-count").innerText()));
+  for (const tile of tiles) {
+    assert.match(tile.href, PAGES_NIGHT, `${tile.title} does not link to its Pages app`);
+    assert.ok(tile.href.endsWith(`${tile.title.toLowerCase().replace(/\s+/g, "-")}/`), `${tile.title} links to ${tile.href}`);
+    assert.equal(tile.target, "_blank", `${tile.title} does not open in a new tab`);
+    assert.match(tile.rel, /\bnoopener\b/, `${tile.title} is missing rel=noopener`);
+    assert.match(tile.open, /Open the app/, `${tile.title} has no "Open the app" link text`);
+  }
+  const shots = tiles.filter((tile) => tile.shot);
+  assert.ok(shots.length > 0, "no night has a screenshot");
+  for (const { title, shot } of shots) {
+    assert.match(shot.alt, /\S.* — screenshot$/, `${title}: the screenshot has no meaningful alt text`);
+    assert.ok(shot.width > 0 && shot.height > 0, `${title}: the screenshot has no width/height, so it shifts the layout`);
+    assert.equal(shot.loading, "lazy", `${title}: the screenshot is not lazy-loaded`);
+    assert.match(shot.src, /^\/nights\/[\w-]+\.webp$/, `${title}: the screenshot is not served from this site`);
+    const response = await page.request.get(new URL(shot.src, BASE).href);
+    assert.equal(response.status(), 200, `${title}: ${shot.src} is ${response.status()}`);
+  }
   await context.close();
 });
 
