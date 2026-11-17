@@ -594,6 +594,15 @@ h2 {
 .inline-link {
   white-space: nowrap;
 }
+/* A 44px tap target on touch screens without moving the line it sits in:
+   inline padding grows the hit box, the matching negative margin keeps the
+   text where it was. */
+@media (max-width: 900px) {
+  .inline-link {
+    padding-block: 0.85rem;
+    margin-block: -0.85rem;
+  }
+}
 
 /* --- Act 1: boot --------------------------------------------------------- */
 

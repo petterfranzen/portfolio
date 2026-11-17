@@ -222,12 +222,14 @@ await check("phone copy is 16px and the brand is a 44px target", async () => {
       eyebrow: px(".eyebrow"),
       idea: px(".tile-idea"),
       brand: document.querySelector(".brand").getBoundingClientRect(),
+      allNights: document.querySelector("#act-4 .inline-link").getBoundingClientRect(),
     };
   });
   for (const [name, size] of Object.entries(sizes)) {
-    if (name === "brand") continue;
+    if (name === "brand" || name === "allNights") continue;
     assert.ok(size >= 16, `${name} copy is ${size}px on a phone`);
   }
+  assert.ok(sizes.allNights.height >= 44, `"All of them" is ${Math.round(sizes.allNights.height)}px tall on a phone`);
   assert.ok(sizes.brand.width >= 44 && sizes.brand.height >= 44, `brand target is ${Math.round(sizes.brand.width)}x${Math.round(sizes.brand.height)}`);
 
   // The wordmark and the "Jump to" label are too wide for a phone, so they are
