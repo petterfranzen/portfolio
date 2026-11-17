@@ -125,6 +125,8 @@ Other scripts:
 npm run build            # generate the night list, type-check, build into dist/
 npm run preview          # serve the production build locally
 npm run test:lab         # the smoke test, against a running preview
+npm run test:headers     # nginx headers + CSP vs every page's scripts
+node tests/serve-dist.mjs  # serve dist/ with the nginx headers, as CI does
 npm run experiments:check  # fail if the committed night list is stale
 ```
 
@@ -153,10 +155,10 @@ another shell `PORTFOLIO_URL=http://localhost:4173 npm run test:lab`.
 ## Continuous integration
 
 Every pull request runs `.github/workflows/ci.yml`: `tsc` and a production
-build, `npm run experiments:check` (which fails if `src/experiments.generated.json`
-has drifted from ghost-in-the-machine), then the smoke test against a
-`vite preview` of the built site. It reads the repository with the workflow's
-own `GITHUB_TOKEN`, so the nightly list can't go stale without a red build.
+build, then `npm run test:headers` (the nginx headers, and every script in
+every built page checked against the CSP's `script-src`), then the smoke test
+against `dist/` served by `tests/serve-dist.mjs`, which sends the same headers
+nginx does — so a script the CSP would block fails the build.
 Publishing the image stays a separate workflow, `docker-publish.yml`, on `main`.
 
 ## Deployment

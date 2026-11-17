@@ -7,6 +7,9 @@
  *
  *   npm run build && npm run preview
  *   PORTFOLIO_URL=http://localhost:4173 node tests/smoke.spec.mjs
+ *
+ * CI serves dist/ with tests/serve-dist.mjs instead, so the suite also runs
+ * under the CSP and the other headers nginx sends.
  */
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
@@ -552,6 +555,23 @@ await check("the theme is shared between the two pages", async () => {
   await context.close();
 });
 
+
+await check("both pages apply a saved dark theme before first paint", async () => {
+  // Under the served CSP (tests/serve-dist.mjs in CI) a blocked boot script
+  // leaves the page in the default theme and logs a violation.
+  const context = await browser.newContext({ colorScheme: "light" });
+  await context.addInitScript(() => localStorage.setItem("theme", "dark"));
+  const page = await context.newPage();
+  const errors = [];
+  page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
+  for (const path of ["/", "/how-this-was-built/"]) {
+    await page.goto(`${BASE}${path}`, { waitUntil: "domcontentloaded" });
+    const theme = await page.evaluate(() => document.documentElement.dataset.theme);
+    assert.equal(theme, "dark", `${path} did not apply the saved theme`);
+  }
+  assert.deepEqual(errors, [], "a script was blocked or threw");
+  await context.close();
+});
 
 await browser.close();
 
