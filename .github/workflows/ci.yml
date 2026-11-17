@@ -32,3 +32,19 @@ jobs:
       # "build" is tsc && vite build (the prebuild hook regenerates the night list)
       - name: Type-check and build
         run: npm run build
+
+      # After the build, so every HTML file in dist/ is checked against the CSP.
+      - name: Security headers (static)
+        run: npm run test:headers
+
+      # The smoke journey against dist/, served with the same headers nginx
+      # sends (CSP included), so a script the CSP blocks fails the run.
+      # Uses the runner's preinstalled Chrome: no browser download.
+      - name: Smoke tests under the served headers
+        env:
+          PORTFOLIO_URL: http://127.0.0.1:4173
+          CHROMIUM_PATH: /usr/bin/google-chrome
+        run: |
+          node tests/serve-dist.mjs &
+          for _ in $(seq 1 30); do curl -fsS -o /dev/null "$PORTFOLIO_URL/" && break; sleep 1; done
+          npm run test:lab

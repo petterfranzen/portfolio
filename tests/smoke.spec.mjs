@@ -7,6 +7,9 @@
  *
  *   npm run build && npm run preview
  *   PORTFOLIO_URL=http://localhost:4173 node tests/smoke.spec.mjs
+ *
+ * CI serves dist/ with tests/serve-dist.mjs instead, so the suite also runs
+ * under the CSP and the other headers nginx sends.
  */
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
@@ -159,6 +162,13 @@ await check("the page reads with JavaScript off", async () => {
   assert.match(text, /Engineering leader/);
   assert.match(text, /Flight Tracker/);
   assert.match(text, /Lantern Moss/);
+  // The new sections are HTML too: the loop, the crew, the panel, the standouts.
+  for (const heading of [/The crew/, /What gets measured/, /What the experiment tests/, /Standouts so far/]) {
+    assert.match(text, heading);
+  }
+  assert.ok(await page.locator(".crew-card").count() > 0, "no crew without JavaScript");
+  assert.ok(await page.locator(".pick").count() > 0, "no standouts without JavaScript");
+  assert.ok(await page.locator(".tile img.tile-shot").count() > 0, "no night screenshots without JavaScript");
   assert.match(text, /linkedin\.com\/in\/petterf/);
   const hrefs = await page.locator("a[href^='http']").evaluateAll((links) => links.map((link) => link.href));
   assert.ok(hrefs.some((href) => href.startsWith("https://flight.pastabake.cloud")));
@@ -215,12 +225,14 @@ await check("phone copy is 16px and the brand is a 44px target", async () => {
       eyebrow: px(".eyebrow"),
       idea: px(".tile-idea"),
       brand: document.querySelector(".brand").getBoundingClientRect(),
+      allNights: document.querySelector("#act-4 .inline-link").getBoundingClientRect(),
     };
   });
   for (const [name, size] of Object.entries(sizes)) {
-    if (name === "brand") continue;
+    if (name === "brand" || name === "allNights") continue;
     assert.ok(size >= 16, `${name} copy is ${size}px on a phone`);
   }
+  assert.ok(sizes.allNights.height >= 44, `"All of them" is ${Math.round(sizes.allNights.height)}px tall on a phone`);
   assert.ok(sizes.brand.width >= 44 && sizes.brand.height >= 44, `brand target is ${Math.round(sizes.brand.width)}x${Math.round(sizes.brand.height)}`);
 
   // The wordmark and the "Jump to" label are too wide for a phone, so they are
@@ -322,6 +334,141 @@ await check("keyboard only: the nightly list is reachable and named", async () =
   await context.close();
 });
 
+await check("Section 9 has its loop, a crew baked from the roster and what is measured", async () => {
+  const { context, page } = await open();
+  const act = page.locator("#act-2");
+  assert.equal(await act.locator(".stage").count(), 6, "the loop should have six stages");
+  const crew = await act.locator(".crew-card h4").allInnerTexts();
+  assert.ok(crew.length >= 3, `only ${crew.length} crew cards were baked in`);
+  const stat = await page.locator("#stats .stat dd").first().innerText();
+  assert.equal(Number(stat), crew.length, "the agent count and the crew cards disagree");
+  for (const line of await act.locator(".crew-line").allInnerTexts()) {
+    assert.ok(line.trim().length > 20, "a crew card has no line");
+  }
+  const text = await page.locator("body").innerText();
+  assert.ok(!/\b(Saito|Aramaki)\b/.test(text), "an agent who has left the team is still on the page");
+  assert.ok(!/<!--[A-Za-z-]+-->/.test(await page.content()), "a build-time placeholder was left in the HTML");
+  const kpis = (await act.locator(".kpi h4").allInnerTexts()).map((kpi) => kpi.trim());
+  assert.deepEqual(kpis, ["Budget", "Models", "Timeouts", "Code health"]);
+  // The code-health claim is a hypothesis until there is data: it must say so.
+  assert.match(await act.locator(".kpi-open").innerText(), /being measured/i);
+  await context.close();
+});
+
+await check("the Flight Tracker act says what the experiment tests", async () => {
+  const { context, page } = await open();
+  const panel = page.locator("#act-3 .tests");
+  assert.match(await panel.locator("h3").innerText(), /What the experiment tests/);
+  assert.equal(await panel.locator(".tests-list li").count(), 5);
+  const text = await panel.innerText();
+  for (const fact of [/one JVM/, /SQLite/, /MapLibre GL/, /health endpoint/, /QA pass/]) {
+    assert.match(text, fact);
+  }
+  await context.close();
+});
+
+const TILE_FIELDS = {
+  title: ".tile-title",
+  language: ".tile-lang",
+  idea: ".tile-idea",
+  verdict: ".verdict-text",
+  badge: ".verdict-badge",
+};
+
+/** Every tile in the strip as plain data: its text fields and its standing. */
+function readNights(page) {
+  return page.locator(".tile").evaluateAll((tiles, fields) => {
+    const read = (tile, selector) => (tile.querySelector(selector)?.textContent ?? "").trim();
+    return tiles.map((tile) => ({
+      ...Object.fromEntries(Object.entries(fields).map(([key, selector]) => [key, read(tile, selector)])),
+      standing: tile.querySelector(fields.badge).dataset.standing,
+    }));
+  }, TILE_FIELDS);
+}
+
+await check("every night shows its language, idea and verdict", async () => {
+  const { context, page } = await open();
+  const nights = await readNights(page);
+  assert.equal(nights.length, Number(await page.locator("#strip-count").innerText()));
+  for (const night of nights) {
+    assert.ok(night.language, `${night.title} has no language`);
+    assert.ok(night.idea, `${night.title} has no idea`);
+    assert.match(night.standing, /^(liked|reviewed|pending)$/, `${night.title} has no verdict badge`);
+    // A night that has been reviewed shows the words, not just the badge.
+    assert.equal(night.verdict.length > 0, night.standing !== "pending", `${night.title}: verdict text and badge disagree`);
+  }
+  await context.close();
+});
+
+await check("the standouts are the newest liked nights, with their verdicts", async () => {
+  const { context, page } = await open();
+  const nights = await readNights(page);
+  const liked = nights.filter((night) => night.standing === "liked").map((night) => night.title);
+  const picks = await page.locator(".pick h4").allInnerTexts();
+  assert.equal(picks.length, Math.min(4, liked.length), "four standouts at most, all of them liked");
+  picks.forEach((pick, index) =>
+    assert.ok(pick.includes(liked[index]), `standout ${index + 1} is "${pick}", expected ${liked[index]}`),
+  );
+  for (const verdict of await page.locator(".pick-verdict").allInnerTexts()) {
+    assert.ok(verdict.replace(/^verdict/i, "").trim().length > 10, "a standout has no verdict");
+  }
+  assert.match(
+    await page.locator("#night-summary").innerText(),
+    new RegExp(`^${nights.length} nights? · \\d+ languages? · ${liked.length} liked`),
+  );
+  await context.close();
+});
+
+const PAGES_NIGHT = /^https:\/\/petterfranzen\.github\.io\/ghost-in-the-machine\/\d{4}-\d{2}-\d{2}-[a-z0-9-]+\/$/;
+
+/** Each tile's app link and, when it has one, its screenshot. */
+function readTileLinks(page) {
+  return page.locator(".tile").evaluateAll((tiles) =>
+    tiles.map((tile) => {
+      const link = tile.querySelector("a.tile-link");
+      const shot = tile.querySelector("img.tile-shot");
+      return {
+        title: tile.querySelector(".tile-title")?.textContent?.trim() ?? "",
+        href: link?.href ?? "",
+        target: link?.target ?? "",
+        rel: link?.rel ?? "",
+        open: tile.querySelector(".tile-open")?.textContent ?? "",
+        shot: shot && {
+          src: shot.getAttribute("src") ?? "",
+          alt: shot.getAttribute("alt") ?? "",
+          width: Number(shot.getAttribute("width")),
+          height: Number(shot.getAttribute("height")),
+          loading: shot.getAttribute("loading"),
+        },
+      };
+    }),
+  );
+}
+
+await check("every night links to its app on GitHub Pages, with its screenshot", async () => {
+  const { context, page } = await open();
+  const tiles = await readTileLinks(page);
+  assert.equal(tiles.length, Number(await page.locator("#strip-count").innerText()));
+  for (const tile of tiles) {
+    assert.match(tile.href, PAGES_NIGHT, `${tile.title} does not link to its Pages app`);
+    assert.ok(tile.href.endsWith(`${tile.title.toLowerCase().replace(/\s+/g, "-")}/`), `${tile.title} links to ${tile.href}`);
+    assert.equal(tile.target, "_blank", `${tile.title} does not open in a new tab`);
+    assert.match(tile.rel, /\bnoopener\b/, `${tile.title} is missing rel=noopener`);
+    assert.match(tile.open, /Open the app/, `${tile.title} has no "Open the app" link text`);
+  }
+  const shots = tiles.filter((tile) => tile.shot);
+  assert.ok(shots.length > 0, "no night has a screenshot");
+  for (const { title, shot } of shots) {
+    assert.match(shot.alt, /\S.* — screenshot$/, `${title}: the screenshot has no meaningful alt text`);
+    assert.ok(shot.width > 0 && shot.height > 0, `${title}: the screenshot has no width/height, so it shifts the layout`);
+    assert.equal(shot.loading, "lazy", `${title}: the screenshot is not lazy-loaded`);
+    assert.match(shot.src, /^\/nights\/[\w-]+\.webp$/, `${title}: the screenshot is not served from this site`);
+    const response = await page.request.get(new URL(shot.src, BASE).href);
+    assert.equal(response.status(), 200, `${title}: ${shot.src} is ${response.status()}`);
+  }
+  await context.close();
+});
+
 await check("the footer links to a working How this was built page", async () => {
   const { context, page } = await open();
   const link = page.locator("footer a[href='/how-this-was-built/']");
@@ -398,6 +545,9 @@ await check("the theme is shared between the two pages", async () => {
   await page.goto(`${BASE}/how-this-was-built/`, { waitUntil: "networkidle" });
   const toggle = page.locator("#theme-toggle");
   await toggle.click();
+  // The swap runs inside a view transition, so it lands a frame or two after
+  // the click: wait for the choice to be saved before reading it.
+  await page.waitForFunction(() => localStorage.getItem("theme") === document.documentElement.dataset.theme);
   const chosen = await page.locator("html").getAttribute("data-theme");
   assert.ok(["light", "dark"].includes(chosen), `the new page set theme "${chosen}"`);
   await page.goto(BASE, { waitUntil: "networkidle" });
@@ -405,6 +555,23 @@ await check("the theme is shared between the two pages", async () => {
   await context.close();
 });
 
+
+await check("both pages apply a saved dark theme before first paint", async () => {
+  // Under the served CSP (tests/serve-dist.mjs in CI) a blocked boot script
+  // leaves the page in the default theme and logs a violation.
+  const context = await browser.newContext({ colorScheme: "light" });
+  await context.addInitScript(() => localStorage.setItem("theme", "dark"));
+  const page = await context.newPage();
+  const errors = [];
+  page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
+  for (const path of ["/", "/how-this-was-built/"]) {
+    await page.goto(`${BASE}${path}`, { waitUntil: "domcontentloaded" });
+    const theme = await page.evaluate(() => document.documentElement.dataset.theme);
+    assert.equal(theme, "dark", `${path} did not apply the saved theme`);
+  }
+  assert.deepEqual(errors, [], "a script was blocked or threw");
+  await context.close();
+});
 
 await browser.close();
 

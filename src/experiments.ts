@@ -18,8 +18,12 @@ export interface Experiment {
   title: string;
   /** Language it was written in. */
   language: string;
-  /** One line on the idea, from the repo's LOG.md. */
+  /** One line on the idea, from the night's night.json. */
   idea: string;
+  /** The feedback the night got, as written in its night.json. */
+  verdict: string;
+  /** liked, reviewed or pending — derived from the verdict at build time. */
+  standing: string;
   /** The published page for this night. */
   url: string;
 }
