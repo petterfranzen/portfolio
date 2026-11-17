@@ -107,5 +107,13 @@ export default defineConfig({
   build: {
     target: "es2022",
     cssTarget: "chrome111",
+    rollupOptions: {
+      // Two documents, not one: the five acts, and the plain prose page that
+      // explains how they are made. Each gets its own hashed assets.
+      input: {
+        index: path.resolve("index.html"),
+        "how-this-was-built": path.resolve("how-this-was-built/index.html"),
+      },
+    },
   },
 });

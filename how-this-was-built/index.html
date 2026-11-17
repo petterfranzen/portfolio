@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#04070a" />
+    <meta
+      name="description"
+      content="How Section 9 works: a small crew of AI agents that build, research, test and review software, with a human who reads the pull requests and merges."
+    />
+    <title>How this was built — Section 9</title>
+    <script>
+      // Before first paint: mark that JS is running and apply the saved theme.
+      // Without JS the saved choice is simply not read and the page is a
+      // readable, stacked document in the default theme.
+      (function () {
+        var root = document.documentElement;
+        root.classList.add("js");
+        try {
+          var saved = localStorage.getItem("theme");
+          if (saved === "light" || saved === "dark") root.dataset.theme = saved;
+          else if (matchMedia("(prefers-color-scheme: light)").matches)
+            root.dataset.theme = "light";
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="atmos" aria-hidden="true">
+      <div class="atmos-layer atmos-grid"></div>
+      <div class="atmos-layer atmos-dots"></div>
+      <div class="atmos-layer atmos-rings"></div>
+      <div class="atmos-layer atmos-glow"></div>
+      <div class="atmos-layer atmos-scan"></div>
+    </div>
+
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Section 9 — back to the portfolio">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">Section 9</span>
+      </a>
+      <div class="topbar-actions">
+        <button
+          class="chip chip-icon"
+          id="theme-toggle"
+          type="button"
+          aria-label="Switch to light theme"
+          aria-pressed="false"
+        >
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2.6v2.6M12 18.8v2.6M2.6 12h2.6M18.8 12h2.6M5.4 5.4l1.8 1.8M16.8 16.8l1.8 1.8M18.6 5.4l-1.8 1.8M7.2 16.8l-1.8 1.8" />
+          </svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M20 14.4A8.4 8.4 0 0 1 9.6 4a8.4 8.4 0 1 0 10.4 10.4Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="main" class="page">
+      <article class="page-inner">
+        <p class="page-eyebrow">About this site</p>
+        <h1>How this was built</h1>
+        <p class="page-lede">
+          The portfolio you just scrolled is made by a small crew of AI agents,
+          with one person at the end of the queue. This page is the short version
+          of how that works.
+        </p>
+
+        <h2>What Section 9 is</h2>
+        <p>
+          Section 9 is a crew of AI agents that builds software on a schedule,
+          the same way a small team would. Each agent has one job, and every
+          piece of work passes through more than one of them before it is
+          finished. There are five:
+        </p>
+        <ul>
+          <li>
+            <strong>Engineering</strong> writes the code. Small commits, tests
+            before the push, no exceptions.
+          </li>
+          <li>
+            <strong>Quality assurance</strong> drives the finished thing like a
+            stranger would: on a phone, on the narrowest screen, with the
+            network off.
+          </li>
+          <li>
+            <strong>Research</strong> reads the documentation and the notes from
+            earlier attempts, so the next try is not a repeat of the last one.
+          </li>
+          <li>
+            <strong>Architecture and review</strong> looks at the shape of a
+            change: its boundaries, how it fails, and whether it belongs at all.
+          </li>
+          <li>
+            <strong>Experiments</strong> builds one new thing every night, in a
+            language it has not used yet. Those are the tiles in the fourth act.
+          </li>
+        </ul>
+        <p>
+          A coordinator hands out the work, and I am the human on the other side
+          of it. Nothing here finishes without a person reading it.
+        </p>
+
+        <h2>How a task moves</h2>
+        <p>
+          Every piece of work starts as a task with a definition of done and a
+          deadline. From there it is always the same loop:
+        </p>
+        <ol>
+          <li>
+            An agent picks the task up, and claims it so that no one else starts
+            the same thing at the same time.
+          </li>
+          <li>
+            It builds the change on its own branch, a copy of the code that
+            cannot affect anything live, and opens a pull request. A pull
+            request is a proposal: the change, plus the reasoning and the
+            evidence that it works.
+          </li>
+          <li>
+            A different agent reviews it. Review and testing never come from the
+            author of the change. That is a hard rule rather than a habit.
+          </li>
+          <li>
+            A person reads the proposal, the review and the evidence, and either
+            merges it or sends it back. Merging is what puts code in front of
+            anyone.
+          </li>
+        </ol>
+
+        <h2>What the agents may not do</h2>
+        <ul>
+          <li>
+            <strong>They may not merge.</strong> Only a person merges, and
+            merging is the step that ships.
+          </li>
+          <li>
+            <strong>They may not push to the main branch</strong>, the one that
+            is live. Work reaches it only through a reviewed proposal.
+          </li>
+          <li>
+            <strong>They may not hold secrets.</strong> No credentials, no keys,
+            no deploying: the tools they run with do not have them.
+          </li>
+          <li>
+            <strong>They may not approve their own work.</strong> Every change
+            gets a second look from someone who did not write it.
+          </li>
+        </ul>
+
+        <h2>Why it is worth doing</h2>
+        <p>
+          Not for speed on its own. The tedious parts of building software —
+          the tests, the second read of the documentation, the pass on a phone
+          with the network off — are exactly the parts a person drops when they
+          are tired or in a hurry. An agent does them every single time, and
+          says so when it cannot. What is left for me is the design, the
+          judgement and the decision to ship.
+        </p>
+
+        <p class="page-back">
+          <a class="button" href="/">Back to the portfolio <span aria-hidden="true">↗</span></a>
+        </p>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p class="footer-line">
+        Section 9 <span aria-hidden="true">·</span> a small crew of AI agents, and
+        one human who reads the pull requests.
+      </p>
+      <nav class="footer-nav" aria-label="Elsewhere">
+        <a href="/how-this-was-built/">How this was built</a>
+        <a
+          href="https://www.linkedin.com/in/petterf/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >LinkedIn <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </footer>
+
+    <script type="module" src="/src/page.ts"></script>
+  </body>
+</html>
