@@ -66,6 +66,122 @@ function buildArcs(): Arc[] {
   }));
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface Scene {
+  context: CanvasRenderingContext2D;
+  width: number;
+  height: number;
+  colours: { cyan: string; hot: string };
+}
+
+const TRAIL_STEPS = 18;
+
+const mapX = (scene: Scene, lon: number) => scene.width * 0.06 + ((lon + 180) / 360) * scene.width * 0.88;
+const mapY = (scene: Scene, lat: number) => scene.height * 0.12 + ((90 - lat) / 180) * scene.height * 0.76;
+
+const project = (scene: Scene, hub: Hub): Point => ({ x: mapX(scene, hub.lon), y: mapY(scene, hub.lat) });
+
+function bezier(a: Point, b: Point, c: Point, t: number): Point {
+  const u = 1 - t;
+  return {
+    x: u * u * a.x + 2 * u * t * c.x + t * t * b.x,
+    y: u * u * a.y + 2 * u * t * c.y + t * t * b.y,
+  };
+}
+
+function strokeLine(scene: Scene, from: Point, to: Point) {
+  const { context } = scene;
+  context.beginPath();
+  context.moveTo(from.x, from.y);
+  context.lineTo(to.x, to.y);
+  context.stroke();
+}
+
+/** Graticule: quiet, but enough to read as a map. */
+function drawGraticule(scene: Scene) {
+  const { context, width, height, colours } = scene;
+  context.lineWidth = 1;
+  for (let lon = -180; lon <= 180; lon += 30) {
+    const x = mapX(scene, lon);
+    context.strokeStyle = `rgba(${colours.cyan}, 0.045)`;
+    strokeLine(scene, { x, y: height * 0.12 }, { x, y: height * 0.88 });
+  }
+  for (let lat = -60; lat <= 60; lat += 30) {
+    const y = mapY(scene, lat);
+    context.strokeStyle = `rgba(${colours.cyan}, 0.045)`;
+    strokeLine(scene, { x: width * 0.06, y }, { x: width * 0.94, y });
+  }
+}
+
+function arcControl(a: Point, b: Point, curve: number): Point {
+  const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const length = Math.hypot(dx, dy) || 1;
+  return {
+    x: mid.x - (dy / length) * length * curve,
+    y: mid.y + (dx / length) * length * curve - length * 0.12,
+  };
+}
+
+function drawTrail(scene: Scene, curve: [Point, Point, Point], head: number) {
+  const { context, colours } = scene;
+  const [a, b, control] = curve;
+  const tailStart = Math.max(0, head - 0.14);
+  let previous = bezier(a, b, control, tailStart);
+  for (let step = 1; step <= TRAIL_STEPS; step += 1) {
+    const t = tailStart + ((head - tailStart) * step) / TRAIL_STEPS;
+    const point = bezier(a, b, control, t);
+    const alpha = 0.06 + (step / TRAIL_STEPS) * 0.55;
+    context.strokeStyle = `rgba(${colours.cyan}, ${alpha.toFixed(3)})`;
+    context.lineWidth = 1.2;
+    strokeLine(scene, previous, point);
+    previous = point;
+  }
+}
+
+function fillDot(scene: Scene, point: Point, radius: number, style: string) {
+  const { context } = scene;
+  context.fillStyle = style;
+  context.beginPath();
+  context.arc(point.x, point.y, radius, 0, Math.PI * 2);
+  context.fill();
+}
+
+function drawEndpoints(scene: Scene, a: Point, b: Point) {
+  const { context, colours } = scene;
+  context.fillStyle = `rgba(${colours.cyan}, 0.5)`;
+  context.beginPath();
+  context.arc(a.x, a.y, 1.1, 0, Math.PI * 2);
+  context.arc(b.x, b.y, 1.1, 0, Math.PI * 2);
+  context.fill();
+}
+
+function drawArc(scene: Scene, arc: Arc, head: number) {
+  const { context, colours } = scene;
+  const a = project(scene, arc.from);
+  const b = project(scene, arc.to);
+  const control = arcControl(a, b, arc.curve);
+
+  context.strokeStyle = `rgba(${colours.cyan}, 0.13)`;
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(a.x, a.y);
+  context.quadraticCurveTo(control.x, control.y, b.x, b.y);
+  context.stroke();
+
+  drawTrail(scene, [a, b, control], head);
+
+  const dot = bezier(a, b, control, head);
+  fillDot(scene, dot, 1.8, `rgba(${colours.hot}, 0.9)`);
+  fillDot(scene, dot, 6, `rgba(${colours.hot}, 0.16)`);
+  drawEndpoints(scene, a, b);
+}
+
 export function initFlightArcs(canvas: HTMLCanvasElement): () => void {
   const context = canvas.getContext("2d");
   if (!context) return () => {};
@@ -97,98 +213,14 @@ export function initFlightArcs(canvas: HTMLCanvasElement): () => void {
     return fallback;
   }
 
-  const project = (hub: Hub) => ({
-    x: width * 0.06 + ((hub.lon + 180) / 360) * width * 0.88,
-    y: height * 0.12 + ((90 - hub.lat) / 180) * height * 0.76,
-  });
-
-  const bezier = (
-    a: { x: number; y: number },
-    b: { x: number; y: number },
-    c: { x: number; y: number },
-    t: number,
-  ) => {
-    const u = 1 - t;
-    return {
-      x: u * u * a.x + 2 * u * t * c.x + t * t * b.x,
-      y: u * u * a.y + 2 * u * t * c.y + t * t * b.y,
-    };
-  };
-
   const draw = (time: number) => {
-    if (!context || width === 0 || height === 0) return;
+    if (width === 0 || height === 0) return;
+    const scene: Scene = { context, width, height, colours };
     context.clearRect(0, 0, width, height);
-
-    // Graticule: quiet, but enough to read as a map.
-    context.lineWidth = 1;
-    for (let lon = -180; lon <= 180; lon += 30) {
-      const x = width * 0.06 + ((lon + 180) / 360) * width * 0.88;
-      context.strokeStyle = `rgba(${colours.cyan}, 0.045)`;
-      context.beginPath();
-      context.moveTo(x, height * 0.12);
-      context.lineTo(x, height * 0.88);
-      context.stroke();
-    }
-    for (let lat = -60; lat <= 60; lat += 30) {
-      const y = height * 0.12 + ((90 - lat) / 180) * height * 0.76;
-      context.strokeStyle = `rgba(${colours.cyan}, 0.045)`;
-      context.beginPath();
-      context.moveTo(width * 0.06, y);
-      context.lineTo(width * 0.94, y);
-      context.stroke();
-    }
-
+    drawGraticule(scene);
     for (const arc of arcs) {
-      const a = project(arc.from);
-      const b = project(arc.to);
-      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const length = Math.hypot(dx, dy) || 1;
-      const control = {
-        x: mid.x - (dy / length) * length * arc.curve,
-        y: mid.y + (dx / length) * length * arc.curve - length * 0.12,
-      };
-
-      context.strokeStyle = `rgba(${colours.cyan}, 0.13)`;
-      context.lineWidth = 1;
-      context.beginPath();
-      context.moveTo(a.x, a.y);
-      context.quadraticCurveTo(control.x, control.y, b.x, b.y);
-      context.stroke();
-
       const head = reduce.matches ? 0.55 : (time * arc.speed + arc.offset) % 1;
-      const tailStart = Math.max(0, head - 0.14);
-      const steps = 18;
-      let previous = bezier(a, b, control, tailStart);
-      for (let step = 1; step <= steps; step += 1) {
-        const t = tailStart + ((head - tailStart) * step) / steps;
-        const point = bezier(a, b, control, t);
-        const alpha = 0.06 + (step / steps) * 0.55;
-        context.strokeStyle = `rgba(${colours.cyan}, ${alpha.toFixed(3)})`;
-        context.lineWidth = 1.2;
-        context.beginPath();
-        context.moveTo(previous.x, previous.y);
-        context.lineTo(point.x, point.y);
-        context.stroke();
-        previous = point;
-      }
-
-      const dot = bezier(a, b, control, head);
-      context.fillStyle = `rgba(${colours.hot}, 0.9)`;
-      context.beginPath();
-      context.arc(dot.x, dot.y, 1.8, 0, Math.PI * 2);
-      context.fill();
-      context.fillStyle = `rgba(${colours.hot}, 0.16)`;
-      context.beginPath();
-      context.arc(dot.x, dot.y, 6, 0, Math.PI * 2);
-      context.fill();
-
-      context.fillStyle = `rgba(${colours.cyan}, 0.5)`;
-      context.beginPath();
-      context.arc(a.x, a.y, 1.1, 0, Math.PI * 2);
-      context.arc(b.x, b.y, 1.1, 0, Math.PI * 2);
-      context.fill();
+      drawArc(scene, arc, head);
     }
   };
 
