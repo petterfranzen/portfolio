@@ -10,9 +10,11 @@ docker-monitor's network.
 
 ## 1. Publish the image
 
-Push to `main` (or run the workflow manually from the Actions tab). This builds
-for amd64 and arm64 and pushes to GHCR as
-`ghcr.io/petterfranzen/portfolio:latest`.
+Merging a PR to `main` runs `.github/workflows/docker-publish.yml`. It
+publishes only from `main` — a branch, a tag or a manual run cannot publish
+it — and it writes exactly one immutable tag for the commit,
+`sha-<short>`. There is no moving `latest`: read the tag off the run's
+summary (or the package's version list) and use it in step 3.
 
 ## 2. Make the GHCR package pullable
 
@@ -25,10 +27,16 @@ describes in more detail.
 ## 3. Run it
 
 ```bash
-docker compose -f deploy/docker-compose.yml up -d
+IMAGE_TAG=sha-<short> docker compose -f deploy/docker-compose.yml up -d
 ```
+
+`IMAGE_TAG` is required: the compose file deliberately has no default, so an
+unset tag is an error rather than a silent pull of whatever last wrote
+`latest`.
 
 Then point the reverse proxy or the NAS's port mapping at port 8081 (or
 `PORTFOLIO_PORT`).
 
-Updating is the same: pull the new image tag and `docker compose up -d`.
+Updating is the same: set `IMAGE_TAG` to the new `sha-<short>` and run
+`docker compose up -d`. Redeploying an old tag always brings back that exact
+build, because the tag never moves.
