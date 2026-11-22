@@ -159,7 +159,8 @@ build, then `npm run test:headers` (the nginx headers, and every script in
 every built page checked against the CSP's `script-src`), then the smoke test
 against `dist/` served by `tests/serve-dist.mjs`, which sends the same headers
 nginx does — so a script the CSP would block fails the build.
-Publishing the image stays a separate workflow, `docker-publish.yml`, on `main`.
+Publishing the image stays a separate workflow, `docker-publish.yml`, and it
+runs only on a push to `main` — never on a branch, a tag or a manual dispatch.
 
 ## Deployment
 
@@ -170,3 +171,12 @@ and docker-monitor use. See [`deploy/README.md`](deploy/README.md).
 The page is entirely static now; the Lab and its `/lab-api/` proxy are gone
 with the earlier landing page. The image is still built and published the same
 way, so the deploy path did not change.
+
+How a deploy is triggered: merging a PR to `main` runs `docker-publish.yml`,
+which builds the image and pushes exactly one immutable tag, `sha-<short>`
+(`latest` is not published). The job runs in the `production` environment, so
+the repo's deployment-branch rule (`main`) applies as well as the workflow's
+own `main`-only trigger. The NAS runs the tag you name: set `IMAGE_TAG` to the
+`sha-<short>` from that run and `docker compose up -d` (see
+[`deploy/README.md`](deploy/README.md)). Nothing on the NAS is rebuilt, and no
+moving tag is involved.

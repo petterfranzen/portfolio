@@ -1,8 +1,9 @@
 # NAS-facing compose file for the portfolio site.
 #
 # Self-contained the same way flight-tracker's and docker-monitor's are:
-# every setting is inlined as ${VAR:-default}, so pasting this one file
-# into a GUI Docker app is enough.
+# every setting is inlined as ${VAR:-default}, except IMAGE_TAG, which has
+# no default on purpose: set it to the image tag to deploy, then pasting this
+# one file into a GUI Docker app is enough.
 #
 # The page is static, so this stack is one independent container. It no
 # longer needs docker-monitor or its network — the Lab that did is gone.
@@ -11,7 +12,14 @@ name: portfolio
 
 services:
   portfolio:
-    image: ghcr.io/petterfranzen/portfolio:${IMAGE_TAG:-latest}
+    # Published only from `main` (see .github/workflows/docker-publish.yml),
+    # and only as an immutable per-commit tag, `sha-<short>`. There is no
+    # moving `latest`: a mutable tag is whatever last wrote it, and that is
+    # what let a branch or tag push change what production pulls.
+    # Pin IMAGE_TAG to the tag the Publish workflow wrote for the commit you
+    # want, so a redeploy always brings up the same build. Deliberately no
+    # default -- an unset IMAGE_TAG is an error, not a silent `latest`.
+    image: ghcr.io/petterfranzen/portfolio:${IMAGE_TAG:?set IMAGE_TAG to the sha-<short> tag from the Publish workflow run}
     container_name: portfolio
     restart: unless-stopped
     ports:
