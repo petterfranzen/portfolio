@@ -1,8 +1,9 @@
 # NAS-facing compose file for the portfolio site.
 #
 # Self-contained the same way flight-tracker's and docker-monitor's are:
-# every setting is inlined as ${VAR:-default}, so pasting this one file
-# into a GUI Docker app is enough.
+# every setting is inlined as ${VAR:-default}, except IMAGE_TAG, which has
+# no default on purpose: set it to the image tag to deploy, then pasting this
+# one file into a GUI Docker app is enough.
 #
 # The page is static, so this stack is one independent container. It no
 # longer needs docker-monitor or its network — the Lab that did is gone.
