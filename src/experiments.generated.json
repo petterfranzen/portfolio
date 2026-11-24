@@ -4,6 +4,94 @@
   "crew": "https://petterfranzen.github.io/ghost-in-the-machine/crew/",
   "experiments": [
     {
+      "date": "2026-11-24",
+      "slug": "2026-11-24-deeproot",
+      "title": "Deeproot",
+      "language": "TypeScript",
+      "idea": "Deeproot: grow a sapling root down through the earth toward a buried ember, one rule at a time",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-24-deeproot/",
+      "thumbnail": "/nights/2026-11-24-deeproot.webp"
+    },
+    {
+      "date": "2026-11-23",
+      "slug": "2026-11-23-moonmirror-marsh",
+      "title": "Moonmirror Marsh",
+      "language": "C# (Blazor WebAssembly)",
+      "idea": "Moonmirror Marsh: a calm pixel-art night marsh where you rotate stone mirrors so a moonbeam reaches every reed-lantern, one new rule per level.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-23-moonmirror-marsh/",
+      "thumbnail": "/nights/2026-11-23-moonmirror-marsh.webp"
+    },
+    {
+      "date": "2026-11-22",
+      "slug": "2026-11-22-lantern-ice",
+      "title": "Lantern Ice",
+      "language": "V (to JavaScript)",
+      "idea": "A moonlit frozen lake you cross with one thumb: tap a direction and the little lantern-keeper skids over the ice until something stops them, lighting every lantern in the bay, one new rule at a time.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-22-lantern-ice/",
+      "thumbnail": "/nights/2026-11-22-lantern-ice.webp"
+    },
+    {
+      "date": "2026-11-21",
+      "slug": "2026-11-21-stillspring",
+      "title": "Stillspring",
+      "language": "Lua",
+      "idea": "Stillspring: a calm stone-channel puzzle - rotate channel pieces so the spring water reaches the garden",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-21-stillspring/",
+      "thumbnail": "/nights/2026-11-21-stillspring.webp"
+    },
+    {
+      "date": "2026-11-20",
+      "slug": "2026-11-20-emberstones",
+      "title": "Emberstones",
+      "language": "C++ (WebAssembly)",
+      "idea": "A ring of standing stones you wake with one thumb: tap a stone and it lights with its neighbours, until every rune in the circle burns.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-20-emberstones/",
+      "thumbnail": "/nights/2026-11-20-emberstones.webp"
+    },
+    {
+      "date": "2026-11-19",
+      "slug": "2026-11-19-moondew",
+      "title": "Moondew",
+      "language": "OCaml (js_of_ocaml)",
+      "idea": "A moonlit pond: trace a one-thumb trail that wakes every dew drop, one pond puzzle at a time",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-19-moondew/",
+      "thumbnail": "/nights/2026-11-19-moondew.webp"
+    },
+    {
+      "date": "2026-11-18",
+      "slug": "2026-11-18-paper-tide",
+      "title": "Paper Tide",
+      "language": "Java (TeaVM to JS)",
+      "idea": "A paper boat drifting down a rainy night gutter you nudge with one thumb: ripples carry it, leaves and rain answer, and the street quietly changes as you play.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-18-paper-tide/",
+      "thumbnail": "/nights/2026-11-18-paper-tide.webp"
+    },
+    {
+      "date": "2026-11-17",
+      "slug": "2026-11-17-nightwatch",
+      "title": "Nightwatch",
+      "language": "Kotlin",
+      "idea": "A hilltop observatory under a night sky: drag to pan the stars, tap a star to chime it, and constellations quietly name themselves.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-17-nightwatch/",
+      "thumbnail": "/nights/2026-11-17-nightwatch.webp"
+    },
+    {
       "date": "2026-11-16",
       "slug": "2026-11-16-fairy-ring",
       "title": "Fairy Ring",
