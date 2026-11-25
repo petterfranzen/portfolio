@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "Section 9 \u2014 a five-act, scroll-driven portfolio for Petter Franz\u00e9n.",
+  "description": "Section 9 — a five-act, scroll-driven portfolio for Petter Franzén.",
   "author": {
     "name": "Petter Franzen",
     "email": ""
@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "vite",
     "experiments": "node scripts/build-experiments.mjs",
+    "capture": "node scripts/capture-nights.mjs",
     "prebuild": "npm run experiments",
     "build": "tsc && vite build",
     "preview": "vite preview",
