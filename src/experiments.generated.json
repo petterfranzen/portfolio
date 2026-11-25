@@ -4,6 +4,17 @@
   "crew": "https://petterfranzen.github.io/ghost-in-the-machine/crew/",
   "experiments": [
     {
+      "date": "2026-11-25",
+      "slug": "2026-11-25-summerkeep",
+      "title": "Summerkeep",
+      "language": "Ruby 3.3 (WebAssembly)",
+      "idea": "Summerkeep: sort jars of preserved summer berries onto their own shelves, one new rule at a time",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-25-summerkeep/",
+      "thumbnail": "/nights/2026-11-25-summerkeep.webp"
+    },
+    {
       "date": "2026-11-24",
       "slug": "2026-11-24-deeproot",
       "title": "Deeproot",
