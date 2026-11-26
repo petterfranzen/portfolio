@@ -4,6 +4,16 @@
   "crew": "https://petterfranzen.github.io/ghost-in-the-machine/crew/",
   "experiments": [
     {
+      "date": "2026-11-26",
+      "slug": "2026-11-26-nightbloom",
+      "title": "Nightbloom",
+      "language": "TypeScript",
+      "idea": "Nightbloom: open a night meadow of flowers with one thumb - tap a flower and it opens along with its neighbours, one new flower kind per level.",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-26-nightbloom/"
+    },
+    {
       "date": "2026-11-25",
       "slug": "2026-11-25-summerkeep",
       "title": "Summerkeep",
