@@ -31,7 +31,11 @@ const REQUIRED = [
   "Referrer-Policy",
   "Permissions-Policy",
   "Content-Security-Policy",
+  "Cross-Origin-Opener-Policy",
+  "Cross-Origin-Resource-Policy",
 ];
+// The only origin the page may frame: the nightly apps' live previews.
+const FRAME_SRC = "https://petterfranzen.github.io";
 
 const failures = [];
 async function check(name, fn) {
@@ -132,6 +136,15 @@ await check("every block that sets a header re-includes the snippet", () => {
   }
 });
 
+const csp = headersConf.match(/Content-Security-Policy\s+"([^"]+)"/)?.[1] ?? "";
+const directive = (name) => csp.match(new RegExp(`(?:^|;)\\s*${name}\\s+([^;]*)`))?.[1].trim();
+
+await check("frame-src allows GitHub Pages and nothing else; default-src stays 'self'", () => {
+  assert.equal(directive("frame-src"), FRAME_SRC);
+  assert.equal(directive("default-src"), "'self'");
+  assert.match(csp, /(?:^|;)\s*upgrade-insecure-requests\s*(?:;|$)/, "upgrade-insecure-requests is missing");
+});
+
 const scriptSrc = headersConf.match(/Content-Security-Policy\s+"([^"]+)"/)?.[1].match(/script-src([^;]*)/)?.[1] ?? "";
 
 await check("script-src allows no inline script by default", () => {
@@ -164,6 +177,20 @@ if (target) {
   }
   await check("the deployed nosniff value matches", () => {
     assert.equal(served("X-Content-Type-Options"), "nosniff");
+  });
+  await check("the deployed CSP allows the nightly previews in frames", () => {
+    assert.match(served("Content-Security-Policy"), new RegExp(`frame-src ${FRAME_SRC}(;|$)`));
+  });
+  // /boot.js is not fingerprinted: nginx sends no-cache, and the edge must not
+  // replace it with a browser TTL (Cloudflare's Browser Cache TTL does).
+  const boot = await fetch(new URL("/boot.js", target), { redirect: "follow" });
+  for (const name of REQUIRED) {
+    await check(`the deployed /boot.js sends ${name}`, () => {
+      assert.ok(boot.headers.get(name.toLowerCase()), `${target}/boot.js does not send ${name}`);
+    });
+  }
+  await check("the deployed /boot.js is served no-cache", () => {
+    assert.match(boot.headers.get("cache-control") ?? "", /no-cache/);
   });
   await check("no inline script is blocked by the served CSP", async () => {
     const csp = served("Content-Security-Policy");

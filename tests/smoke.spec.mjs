@@ -573,6 +573,38 @@ await check("both pages apply a saved dark theme before first paint", async () =
   await context.close();
 });
 
+await check("Play preview mounts the nightly app without a CSP violation", async () => {
+  // Under the served CSP (CI), a frame-src that does not allow GitHub Pages
+  // blocks the preview and fires securitypolicyviolation. The violation fires
+  // when the frame starts to load, whether or not GitHub Pages answers.
+  const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  await context.addInitScript(() => {
+    window.__violations = [];
+    document.addEventListener("securitypolicyviolation", (event) =>
+      window.__violations.push(`${event.violatedDirective} ${event.blockedURI}`),
+    );
+  });
+  const page = await context.newPage();
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  await page.waitForFunction(() => document.documentElement.dataset.ready === "true");
+  await page.locator("#act-4").scrollIntoViewIfNeeded();
+  // The frame is lazy, so press Play on the tile under the centre line, the
+  // one a visitor sees the button on: an offscreen frame would never load.
+  await page.waitForSelector(".tile.is-centre[data-url]", { timeout: 3000 });
+  const url = await page.evaluate(() => {
+    const tile = document.querySelector(".tile.is-centre[data-url]");
+    tile.querySelector(".tile-play").click();
+    return tile.dataset.url;
+  });
+  assert.match(url, /^https:\/\/petterfranzen\.github\.io\//);
+  const frame = page.locator(`.tile-preview iframe[src="${url}"]`);
+  await frame.waitFor({ state: "attached", timeout: 3000 });
+  // Give the frame's navigation time to start (and a violation time to fire).
+  await page.waitForTimeout(1500);
+  assert.deepEqual(await page.evaluate(() => window.__violations), [], "the CSP blocked something");
+  await context.close();
+});
+
 await browser.close();
 
 if (failures.length) {

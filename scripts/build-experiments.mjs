@@ -26,6 +26,11 @@
  * previously generated file is kept so the build still ships a site — a stale
  * list beats a broken one. Set GITHUB_TOKEN to lift the anonymous rate limit.
  *
+ * Set EXPERIMENTS_OFFLINE=1 to skip the reads and keep the committed list as
+ * it is. The Docker build does, so the image ships exactly the reviewed
+ * src/experiments.generated.json rather than whatever ghost-in-the-machine's
+ * main holds at build time; the nightly strip PRs keep that file current.
+ *
  * Pass --check to verify instead of build: it rebuilds the list and fails
  * (exit 1) if the committed file has drifted from ghost-in-the-machine, or if
  * the repo can't be reached — CI runs it so the list can't go stale quietly.
@@ -223,6 +228,11 @@ async function check(rendered, count) {
 }
 
 async function main() {
+  if (process.env.EXPERIMENTS_OFFLINE && !CHECK) {
+    if (!existsSync(OUT)) throw new Error("EXPERIMENTS_OFFLINE is set but there is no committed list");
+    console.log("build-experiments: EXPERIMENTS_OFFLINE set, shipping the committed list");
+    return;
+  }
   const nights = await nightsOrFallback();
   if (!nights) return;
 
