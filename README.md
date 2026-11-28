@@ -41,7 +41,9 @@ gets a `standing` — liked, reviewed or pending — read off its verdict — an
 The result is `src/experiments.generated.json`. That file is committed, so an
 offline build still ships a list; if the reads fail the script keeps the
 committed copy and warns rather than failing the build. Set `GITHUB_TOKEN` to
-lift the anonymous API rate limit.
+lift the anonymous API rate limit. The Docker image build sets `EXPERIMENTS_OFFLINE=1`
+and skips the reads, so production ships exactly the committed, reviewed list;
+the nightly strip PRs keep it current.
 
 `content/crew.json` holds the agents and one line each about what they do,
 written from the briefs in

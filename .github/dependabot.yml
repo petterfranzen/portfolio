@@ -7,6 +7,13 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 1
+    ignore:
+      # The build stage stays on the Node LTS line CI runs (ci.yml,
+      # node-version: 24). Move both together, by hand.
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
 
   # Keeps the SHA pins in .github/workflows/*.yml moving: Dependabot rewrites
   # the pinned commit SHA and its `# vX.Y.Z` comment together, so the publish
@@ -16,3 +23,15 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 1
+
+  # vite, typescript and playwright are dev-only, but they run in the build
+  # that produces the image. cooldown honours the 24 h rule for new releases.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 1
