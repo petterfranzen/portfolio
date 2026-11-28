@@ -4,6 +4,16 @@
   "crew": "https://petterfranzen.github.io/ghost-in-the-machine/crew/",
   "experiments": [
     {
+      "date": "2026-11-27",
+      "slug": "2026-11-27-seedfall",
+      "title": "Seedfall",
+      "language": "TypeScript",
+      "idea": "Seedfall: walk a moonlit orchard floor and nudge glowing seeds into their hollows, one new idea per glade",
+      "verdict": "pending review",
+      "standing": "pending",
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-27-seedfall/"
+    },
+    {
       "date": "2026-11-26",
       "slug": "2026-11-26-nightbloom",
       "title": "Nightbloom",
@@ -11,7 +21,8 @@
       "idea": "Nightbloom: open a night meadow of flowers with one thumb - tap a flower and it opens along with its neighbours, one new flower kind per level.",
       "verdict": "pending review",
       "standing": "pending",
-      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-26-nightbloom/"
+      "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-26-nightbloom/",
+      "thumbnail": "/nights/2026-11-26-nightbloom.webp"
     },
     {
       "date": "2026-11-25",
@@ -85,8 +96,8 @@
       "title": "Moondew",
       "language": "OCaml (js_of_ocaml)",
       "idea": "A moonlit pond: trace a one-thumb trail that wakes every dew drop, one pond puzzle at a time",
-      "verdict": "pending review",
-      "standing": "pending",
+      "verdict": "Petter, 19 Nov: \"The graphics are very intense and glitchy, the game rules are unclear and don't seem to matter. More structure needed.\" Revised 20 Nov: the renderer no longer samples the clock for anything that moves (that was the glitch), everything is drawn on whole pixels, the pulses are slower and shallower and the palette is softer; reduced motion now freezes the water entirely. Pond 1 teaches one dew and one line, ponds 2-4 add moss, deep water and currents one at a time, every rule answers a refused step with a shake and its own sound, the goal is a dew count with a clear pond-awake moment, and Undo/Restart buttons join a tappable pond strip behind a new start screen.",
+      "standing": "reviewed",
       "url": "https://petterfranzen.github.io/ghost-in-the-machine/2026-11-19-moondew/",
       "thumbnail": "/nights/2026-11-19-moondew.webp"
     },
